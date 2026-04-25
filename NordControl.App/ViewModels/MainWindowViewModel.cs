@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NordControl.Core.Models;
@@ -11,14 +13,16 @@ using NordControl.Core.Windows;
 
 namespace NordControl.App.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly IAppSettingsService appSettingsService;
     private readonly IPlatformInfoService platformInfoService;
     private readonly IWindowManagerService windowManagerService;
     private IReadOnlyList<WindowInfo> allWindows = [];
     private AppSettings currentSettings = AppSettings.CreateDefault();
+    private DispatcherTimer? autoRefreshTimer;
     private bool isApplyingSettings;
+    private bool isRefreshingWindows;
 
     public MainWindowViewModel()
         : this(new DesignTimeAppSettingsService(), new DesignTimePlatformInfoService(), new DesignTimeWindowManagerService())
@@ -44,13 +48,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (currentSettings.WindowManager.RefreshOnStartup)
         {
-            LoadWindows();
+            _ = RefreshWindowsAsync();
         }
         else
         {
-            WindowOperationMessage = "Window list not loaded. Click Refresh.";
+            WindowOperationMessage = currentSettings.WindowManager.AutoRefreshIntervalSeconds > 0
+                ? "Window list not loaded on startup. Auto-refresh will run after the configured interval."
+                : "Window list not loaded. Click Refresh.";
             ApplyWindowFilter();
         }
+
+        StartOrUpdateAutoRefreshTimer();
     }
 
     public IReadOnlyList<ShellModuleViewModel> Modules { get; }
@@ -87,6 +95,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool refreshOnStartup = true;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AutoRefreshStatus))]
     private int autoRefreshIntervalSeconds;
 
     [ObservableProperty]
@@ -140,6 +149,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public string CurrentProfile => "Normal";
 
+    public string AutoRefreshStatus => AutoRefreshIntervalSeconds <= 0
+        ? "Auto-refresh disabled."
+        : $"Auto-refresh every {AutoRefreshIntervalSeconds} seconds.";
+
     partial void OnSelectedModuleChanged(ShellModuleViewModel? value)
     {
         if (!isApplyingSettings && value is not null)
@@ -154,9 +167,9 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void RefreshWindows()
+    private async Task RefreshWindowsAsync()
     {
-        LoadWindows();
+        await LoadWindowsAsync();
     }
 
     [RelayCommand]
@@ -171,6 +184,7 @@ public partial class MainWindowViewModel : ViewModelBase
         WriteEditorToSettings();
         appSettingsService.Save(currentSettings);
         SettingsStatusMessage = appSettingsService.LastStatusMessage;
+        StartOrUpdateAutoRefreshTimer();
         ApplyWindowFilter();
     }
 
@@ -178,6 +192,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ReloadSettings()
     {
         LoadSettingsIntoEditor(selectSavedModule: true);
+        StartOrUpdateAutoRefreshTimer();
         ApplyWindowFilter();
     }
 
@@ -187,52 +202,83 @@ public partial class MainWindowViewModel : ViewModelBase
         currentSettings = appSettingsService.ResetToDefaults();
         ApplySettingsToEditor(selectSavedModule: true);
         SettingsStatusMessage = appSettingsService.LastStatusMessage;
+        StartOrUpdateAutoRefreshTimer();
         ApplyWindowFilter();
     }
 
-    private void LoadWindows(string? operationMessage = null)
+    public void Dispose()
     {
+        StopAutoRefreshTimer();
+    }
+
+    private async Task LoadWindowsAsync(string? operationMessage = null, bool isAutoRefresh = false)
+    {
+        if (isRefreshingWindows)
+        {
+            return;
+        }
+
+        isRefreshingWindows = true;
+
         try
         {
-            var windows = windowManagerService.GetOpenWindows();
-            if (!currentSettings.WindowManager.ShowUnknownProcesses)
-            {
-                windows = windows
-                    .Where(window => !string.Equals(window.ProcessName, "Unknown", StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-
-            allWindows = windows;
-            OpenWindowCount = allWindows.Count;
-            TopMostWindowCount = allWindows.Count(window => window.IsTopMost);
-            LastWindowRefreshAt = DateTime.Now;
-            WindowOperationMessage = operationMessage ?? $"Loaded {OpenWindowCount} open windows.";
-            ApplyWindowFilter();
+            var windows = await Task.Run(windowManagerService.GetOpenWindows);
+            ApplyLoadedWindows(
+                windows,
+                operationMessage ?? (isAutoRefresh
+                    ? $"Auto-refreshed {windows.Count} open windows."
+                    : $"Loaded {windows.Count} open windows."));
         }
         catch (Exception ex)
         {
-            allWindows = [];
-            OpenWindowCount = 0;
-            TopMostWindowCount = 0;
-            LastWindowRefreshAt = DateTime.Now;
-            WindowOperationMessage = $"Could not load windows: {ex.Message}";
-            ApplyWindowFilter();
+            ApplyWindowLoadFailure(ex);
         }
+        finally
+        {
+            isRefreshingWindows = false;
+        }
+    }
+
+    private void ApplyLoadedWindows(IReadOnlyList<WindowInfo> windows, string operationMessage)
+    {
+        if (!currentSettings.WindowManager.ShowUnknownProcesses)
+        {
+            windows = windows
+                .Where(window => !string.Equals(window.ProcessName, "Unknown", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        allWindows = windows;
+        OpenWindowCount = allWindows.Count;
+        TopMostWindowCount = allWindows.Count(window => window.IsTopMost);
+        LastWindowRefreshAt = DateTime.Now;
+        WindowOperationMessage = operationMessage;
+        ApplyWindowFilter();
+    }
+
+    private void ApplyWindowLoadFailure(Exception ex)
+    {
+        allWindows = [];
+        OpenWindowCount = 0;
+        TopMostWindowCount = 0;
+        LastWindowRefreshAt = DateTime.Now;
+        WindowOperationMessage = $"Could not load windows: {ex.Message}";
+        ApplyWindowFilter();
     }
 
     private void PinWindow(WindowRowViewModel row)
     {
-        ApplyWindowOperation(windowManagerService.SetTopMost(row.Handle));
+        _ = ApplyWindowOperationAsync(windowManagerService.SetTopMost(row.Handle));
     }
 
     private void UnpinWindow(WindowRowViewModel row)
     {
-        ApplyWindowOperation(windowManagerService.RemoveTopMost(row.Handle));
+        _ = ApplyWindowOperationAsync(windowManagerService.RemoveTopMost(row.Handle));
     }
 
-    private void ApplyWindowOperation(WindowOperationResult result)
+    private async Task ApplyWindowOperationAsync(WindowOperationResult result)
     {
-        LoadWindows(result.Message);
+        await LoadWindowsAsync(result.Message);
         if (!result.Success && result.NativeErrorCode is { } errorCode)
         {
             WindowOperationMessage = $"{result.Message} Native error: {errorCode}.";
@@ -288,6 +334,43 @@ public partial class MainWindowViewModel : ViewModelBase
         currentSettings.WindowManager.ConfirmBeforePinning = ConfirmBeforePinning;
         currentSettings.WindowManager.ShowUnknownProcesses = ShowUnknownProcesses;
         currentSettings.Normalize();
+        AutoRefreshIntervalSeconds = currentSettings.WindowManager.AutoRefreshIntervalSeconds;
+    }
+
+    private void StartOrUpdateAutoRefreshTimer()
+    {
+        StopAutoRefreshTimer();
+
+        var intervalSeconds = currentSettings.WindowManager.AutoRefreshIntervalSeconds;
+        if (intervalSeconds <= 0)
+        {
+            return;
+        }
+
+        autoRefreshTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(intervalSeconds)
+        };
+
+        autoRefreshTimer.Tick += OnAutoRefreshTimerTick;
+        autoRefreshTimer.Start();
+    }
+
+    private void StopAutoRefreshTimer()
+    {
+        if (autoRefreshTimer is null)
+        {
+            return;
+        }
+
+        autoRefreshTimer.Stop();
+        autoRefreshTimer.Tick -= OnAutoRefreshTimerTick;
+        autoRefreshTimer = null;
+    }
+
+    private async void OnAutoRefreshTimerTick(object? sender, EventArgs e)
+    {
+        await LoadWindowsAsync(isAutoRefresh: true);
     }
 
     private sealed class DesignTimeAppSettingsService : IAppSettingsService

@@ -458,11 +458,15 @@
                                          Text="{Binding AutoRefreshIntervalSeconds, Mode=TwoWay}"
                                          MinHeight="34"/>
                                 <TextBlock Grid.Column="2"
-                                           Text="0 disables auto refresh. Timer support is planned for a later task."
+                                           Text="0 disables auto-refresh. A positive value refreshes the window list every N seconds."
                                            Foreground="#8FA1B3"
                                            TextWrapping="Wrap"
                                            VerticalAlignment="Center"/>
                             </Grid>
+
+                            <TextBlock Text="{Binding AutoRefreshStatus}"
+                                       Foreground="#B7D7F2"
+                                       TextWrapping="Wrap"/>
 
                             <CheckBox Content="Confirm before pinning"
                                       IsChecked="{Binding ConfirmBeforePinning, Mode=TwoWay}"/>
