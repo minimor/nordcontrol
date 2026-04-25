@@ -2,6 +2,8 @@
 
 NordControl is planned as a staged personal Windows desktop control center. Each stage should keep the app usable, testable, and safe.
 
+This file is the short roadmap. The main long-form plan is now `docs/DEVELOPMENT_PLAN.md`.
+
 ## Stage 1
 
 - Bootstrap solution and repository structure
