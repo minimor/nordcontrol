@@ -1,6 +1,6 @@
 using NordControl.Core.Models;
 
-namespace NordControl.App.ViewModels;
+namespace NordControl.App.ViewModels.Shell;
 
 public sealed class ShellModuleViewModel(AppModule module)
 {

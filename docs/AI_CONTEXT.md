@@ -30,7 +30,7 @@ Use `dev` for normal work. Do not create new feature branches unless the user ex
 
 The app currently includes:
 
-- Avalonia shell with global left navigation.
+- Avalonia shell with global left navigation and module page hosting.
 - Dashboard with open/topmost window counts.
 - Window Manager with visible window enumeration, search, refresh, topmost pin/unpin, and auto-refresh.
 - Persistent app settings.
@@ -59,8 +59,18 @@ The app currently includes:
 
 ## Important Files
 
-- `NordControl.App/ViewModels/MainWindowViewModel.cs`
+- `NordControl.App/ViewModels/Shell/MainWindowViewModel.cs`
+- `NordControl.App/ViewModels/Shell/ShellModuleViewModel.cs`
+- `NordControl.App/ViewModels/Dashboard/DashboardViewModel.cs`
+- `NordControl.App/ViewModels/WindowManager/WindowManagerViewModel.cs`
+- `NordControl.App/ViewModels/Settings/SettingsViewModel.cs`
+- `NordControl.App/ViewModels/Customization/CustomizationViewModel.cs`
 - `NordControl.App/Views/MainWindow.axaml`
+- `NordControl.App/Views/Dashboard/DashboardView.axaml`
+- `NordControl.App/Views/WindowManager/WindowManagerView.axaml`
+- `NordControl.App/Views/Settings/SettingsView.axaml`
+- `NordControl.App/Views/Customization/CustomizationView.axaml`
+- `NordControl.App/Services/AppStateService.cs`
 - `NordControl.Core/Models/AppSettings.cs`
 - `NordControl.Core/Models/CustomizationSettings.cs`
 - `NordControl.Core/Modules/CustomizationSectionCatalog.cs`
@@ -94,7 +104,7 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 
 ## Current Limitations
 
-- `MainWindowViewModel` and `MainWindow.axaml` are large and should be split into real pages/view models.
+- `MainWindowViewModel` and `MainWindow.axaml` now act as shell/navigation host; module behavior lives in page-specific view models and views.
 - Customization taskbar, Start menu, widget, launcher, layout, and Risk Lab sections are planning UI only.
 - System accent color and wallpaper changes are not implemented.
 - No global hotkeys yet.
@@ -106,12 +116,10 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 
 ## Next Priorities
 
-1. Move from one large window/view model to real navigation infrastructure.
-2. Split Dashboard, Window Manager, Settings, and Customization into separate views/view models.
-3. Add theme package models and import/export.
-4. Improve app-level theme preview and visual state.
-5. Research safe taskbar customization without Explorer patching.
-6. Add Desktop Widgets overlay architecture.
-7. Add Command Launcher and hotkey support.
-8. Add Layout Engine for save/restore and tiling.
-9. Keep Risk Lab isolated and explicit.
+1. Add theme package models and import/export.
+2. Improve app-level theme preview and visual state.
+3. Research safe taskbar customization without Explorer patching.
+4. Add Desktop Widgets overlay architecture.
+5. Add Command Launcher and hotkey support.
+6. Add Layout Engine for save/restore and tiling.
+7. Keep Risk Lab isolated and explicit.

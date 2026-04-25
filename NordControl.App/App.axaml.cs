@@ -4,7 +4,13 @@ using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using NordControl.App.Services;
 using NordControl.App.ViewModels;
+using NordControl.App.ViewModels.Customization;
+using NordControl.App.ViewModels.Dashboard;
+using NordControl.App.ViewModels.Settings;
+using NordControl.App.ViewModels.Shell;
+using NordControl.App.ViewModels.WindowManager;
 using NordControl.App.Views;
 using NordControl.Core.Services;
 using NordControl.Windows.Services;
@@ -42,6 +48,11 @@ public partial class App : Application
         services.AddSingleton<IPlatformInfoService, WindowsPlatformInfoService>();
         services.AddSingleton<IWindowManagerService, WindowsWindowManagerService>();
         services.AddSingleton<IWindowsPersonalizationService, WindowsPersonalizationService>();
+        services.AddSingleton<IAppStateService, AppStateService>();
+        services.AddSingleton<WindowManagerViewModel>();
+        services.AddSingleton<DashboardViewModel>();
+        services.AddSingleton<CustomizationViewModel>();
+        services.AddSingleton<SettingsViewModel>();
         services.AddTransient<MainWindowViewModel>();
 
         return services.BuildServiceProvider();

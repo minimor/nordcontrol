@@ -1,6 +1,6 @@
 using System;
 using Avalonia.Controls;
-using NordControl.App.ViewModels;
+using NordControl.App.ViewModels.Shell;
 
 namespace NordControl.App.Views;
 

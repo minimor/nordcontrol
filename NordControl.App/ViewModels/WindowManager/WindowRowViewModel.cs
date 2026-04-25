@@ -3,7 +3,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using NordControl.Core.Models;
 
-namespace NordControl.App.ViewModels;
+namespace NordControl.App.ViewModels.WindowManager;
 
 public sealed class WindowRowViewModel
 {

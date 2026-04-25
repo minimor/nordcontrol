@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NordControl.App.ViewModels.Shell"
+             x:Class="NordControl.App.Views.Shell.ModulePlaceholderView"
+             x:DataType="vm:ModulePlaceholderViewModel">
+    <Border Background="#161D24"
+            BorderBrush="#273442"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="18">
+        <StackPanel Spacing="8">
+            <TextBlock Text="Module Workspace"
+                       Foreground="#F4F7FA"
+                       FontSize="18"
+                       FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Description}"
+                       Foreground="#9AAABD"
+                       TextWrapping="Wrap"/>
+        </StackPanel>
+    </Border>
+</UserControl>

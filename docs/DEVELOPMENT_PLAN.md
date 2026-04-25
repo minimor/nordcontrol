@@ -21,6 +21,8 @@ Branch/commit note: Commit to `dev`.
 
 Goal: Split the current large `MainWindowViewModel` and `MainWindow.axaml` into real pages and view models.
 
+Status: Implemented. `MainWindow` is now a shell/navigation host with Dashboard, Window Manager, Settings, and Customization page view models and views.
+
 Deliverables:
 
 - Navigation service or shell coordinator

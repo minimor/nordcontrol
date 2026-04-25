@@ -1,0 +1,189 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NordControl.App.ViewModels.WindowManager"
+             x:Class="NordControl.App.Views.WindowManager.WindowManagerView"
+             x:DataType="vm:WindowManagerViewModel">
+    <StackPanel Spacing="18">
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="12">
+            <Button Content="Refresh"
+                    Command="{Binding RefreshWindowsCommand}"/>
+            <TextBox Grid.Column="1"
+                     PlaceholderText="Search by window title or process"
+                     Text="{Binding SearchText, Mode=TwoWay}"
+                     MinHeight="36"/>
+            <Button Grid.Column="2"
+                    Content="Clear"
+                    Command="{Binding ClearSearchCommand}"/>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,*,*"
+              ColumnSpacing="16">
+            <Border Background="#161D24"
+                    BorderBrush="#273442"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Open Windows"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding OpenWindowCount}"
+                               Foreground="#F4F7FA"
+                               FontSize="26"
+                               FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Background="#161D24"
+                    BorderBrush="#273442"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Topmost"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding TopMostWindowCount}"
+                               Foreground="#F4F7FA"
+                               FontSize="26"
+                               FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Background="#161D24"
+                    BorderBrush="#273442"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Last Refresh"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding LastRefreshText}"
+                               Foreground="#F4F7FA"
+                               FontSize="26"
+                               FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Background="#161D24"
+                BorderBrush="#273442"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="18">
+            <StackPanel Spacing="14">
+                <TextBlock Text="{Binding WindowOperationMessage}"
+                           Foreground="#B7D7F2"
+                           TextWrapping="Wrap"/>
+
+                <Grid ColumnDefinitions="2.5*,1.1*,80,110,90,130"
+                      ColumnSpacing="12"
+                      IsVisible="{Binding HasFilteredWindows}">
+                    <TextBlock Text="Window title"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="1"
+                               Text="Process"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="2"
+                               Text="PID"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="3"
+                               Text="HWND"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="4"
+                               Text="Status"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="5"
+                               Text="Actions"
+                               Foreground="#8FA1B3"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding FilteredWindows}"
+                              IsVisible="{Binding HasFilteredWindows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:WindowRowViewModel">
+                            <Border Background="#11171D"
+                                    BorderBrush="#253240"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12"
+                                    Margin="0,0,0,8">
+                                <Grid ColumnDefinitions="2.5*,1.1*,80,110,90,130"
+                                      ColumnSpacing="12"
+                                      VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Title}"
+                                               Foreground="#F4F7FA"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip.Tip="{Binding Title}"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding ProcessName}"
+                                               Foreground="#D8E1EA"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding ProcessId}"
+                                               Foreground="#9AAABD"/>
+                                    <TextBlock Grid.Column="3"
+                                               Text="{Binding HandleHex}"
+                                               Foreground="#9AAABD"/>
+                                    <TextBlock Grid.Column="4"
+                                               Text="{Binding Status}"
+                                               Foreground="#B7D7F2"
+                                               FontWeight="SemiBold"/>
+                                    <StackPanel Grid.Column="5"
+                                                Orientation="Horizontal"
+                                                Spacing="8">
+                                        <Button Content="Pin"
+                                                Command="{Binding PinCommand}"
+                                                IsVisible="{Binding CanPin}"/>
+                                        <Button Content="Unpin"
+                                                Command="{Binding UnpinCommand}"
+                                                IsVisible="{Binding CanUnpin}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border Background="#11171D"
+                        BorderBrush="#253240"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="18"
+                        IsVisible="{Binding ShowNoWindowsEmptyState}">
+                    <TextBlock Text="No windows found. Try refreshing the list."
+                               Foreground="#9AAABD"/>
+                </Border>
+
+                <Border Background="#11171D"
+                        BorderBrush="#253240"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="18"
+                        IsVisible="{Binding ShowNoSearchResultsEmptyState}">
+                    <TextBlock Text="No windows match your search."
+                               Foreground="#9AAABD"/>
+                </Border>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
