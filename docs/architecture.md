@@ -10,6 +10,8 @@ NordControl is split into separate projects so the app can grow without mixing U
 
 `NordControl.Windows` contains Windows-specific implementations. Future P/Invoke, WinAPI wrappers, registry access, service control, window enumeration, and system integrations belong here. This keeps platform concerns behind interfaces defined in Core.
 
+The Window Manager follows this boundary: `NordControl.Core` defines `WindowInfo`, `WindowOperationResult`, and `IWindowManagerService`; `NordControl.Windows` implements enumeration and topmost behavior through WinAPI; `NordControl.App` binds the service results to the Dashboard and Window Manager UI.
+
 `NordControl.Tests` contains tests for non-UI logic. Core behavior should be tested here first. Windows services can also be tested when they expose deterministic behavior or safe environment reads.
 
 ## Dependency Direction

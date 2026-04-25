@@ -4,16 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        d:DesignWidth="1120"
-        d:DesignHeight="720"
+        d:DesignWidth="1180"
+        d:DesignHeight="760"
         x:Class="NordControl.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="NordControl"
-        Width="1120"
-        Height="720"
-        MinWidth="900"
-        MinHeight="560"
+        Width="1180"
+        Height="760"
+        MinWidth="940"
+        MinHeight="600"
         Background="#101418">
 
     <Design.DataContext>
@@ -31,6 +31,13 @@
         <Style Selector="ListBoxItem">
             <Setter Property="Margin" Value="0,3"/>
             <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12,7"/>
+        </Style>
+        <Style Selector="TextBox">
             <Setter Property="CornerRadius" Value="8"/>
         </Style>
     </Window.Styles>
@@ -104,7 +111,7 @@
                                    Foreground="#9AAABD"
                                    FontSize="14"
                                    TextWrapping="Wrap"
-                                   MaxWidth="680"/>
+                                   MaxWidth="760"/>
                     </StackPanel>
 
                     <Border Grid.Column="1"
@@ -121,78 +128,283 @@
                     </Border>
                 </Grid>
 
-                <Grid ColumnDefinitions="*,*"
-                      RowDefinitions="Auto,Auto"
-                      ColumnSpacing="16"
-                      RowSpacing="16">
+                <StackPanel IsVisible="{Binding IsDashboardSelected}" Spacing="18">
+                    <Grid ColumnDefinitions="*,*,*"
+                          ColumnSpacing="16">
+                        <Border Background="#161D24"
+                                BorderBrush="#273442"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Open Windows"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding OpenWindowCount}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="30"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Background="#161D24"
+                                BorderBrush="#273442"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Topmost Windows"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding TopMostWindowCount}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="30"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                Background="#161D24"
+                                BorderBrush="#273442"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Current Profile"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding CurrentProfile}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="30"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
                     <Border Background="#161D24"
                             BorderBrush="#273442"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="18">
-                        <StackPanel Spacing="8">
-                            <TextBlock Text="Module Workspace"
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Window Snapshot"
                                        Foreground="#F4F7FA"
                                        FontSize="18"
                                        FontWeight="SemiBold"/>
-                            <TextBlock Text="This area is ready for the selected module's controls, status panels, and workflows."
+                            <TextBlock Text="{Binding WindowOperationMessage}"
                                        Foreground="#9AAABD"
                                        TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding LastRefreshText}"
+                                       Foreground="#B7D7F2"
+                                       FontSize="12"/>
                         </StackPanel>
                     </Border>
+                </StackPanel>
 
-                    <Border Grid.Column="1"
-                            Background="#161D24"
+                <StackPanel IsVisible="{Binding IsWindowManagerSelected}" Spacing="18">
+                    <Grid ColumnDefinitions="Auto,*,Auto"
+                          ColumnSpacing="12">
+                        <Button Content="Refresh"
+                                Command="{Binding RefreshWindowsCommand}"/>
+                        <TextBox Grid.Column="1"
+                                 PlaceholderText="Search by window title or process"
+                                 Text="{Binding SearchText, Mode=TwoWay}"
+                                 MinHeight="36"/>
+                        <Button Grid.Column="2"
+                                Content="Clear"
+                                Command="{Binding ClearSearchCommand}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*,*"
+                          ColumnSpacing="16">
+                        <Border Background="#161D24"
+                                BorderBrush="#273442"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Open Windows"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding OpenWindowCount}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="26"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Background="#161D24"
+                                BorderBrush="#273442"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Topmost"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding TopMostWindowCount}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="26"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                Background="#161D24"
+                                BorderBrush="#273442"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Last Refresh"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding LastRefreshText}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="26"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Background="#161D24"
                             BorderBrush="#273442"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="18">
-                        <StackPanel Spacing="8">
-                            <TextBlock Text="Safety First"
-                                       Foreground="#F4F7FA"
-                                       FontSize="18"
-                                       FontWeight="SemiBold"/>
-                            <TextBlock Text="System-level features will live behind explicit services, logging, and future rollback paths."
-                                       Foreground="#9AAABD"
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="{Binding WindowOperationMessage}"
+                                       Foreground="#B7D7F2"
                                        TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </Border>
 
-                    <Border Grid.Row="1"
-                            Grid.ColumnSpan="2"
-                            Background="#161D24"
-                            BorderBrush="#273442"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="18">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="Prepared Modules"
-                                       Foreground="#F4F7FA"
-                                       FontSize="18"
-                                       FontWeight="SemiBold"/>
-                            <ItemsControl ItemsSource="{Binding Modules}">
+                            <Grid ColumnDefinitions="2.5*,1.1*,80,110,90,130"
+                                  ColumnSpacing="12"
+                                  IsVisible="{Binding HasFilteredWindows}">
+                                <TextBlock Text="Window title"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="Process"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="PID"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="3"
+                                           Text="HWND"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="4"
+                                           Text="Status"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="5"
+                                           Text="Actions"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding FilteredWindows}"
+                                          IsVisible="{Binding HasFilteredWindows}">
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:ShellModuleViewModel">
-                                        <Grid ColumnDefinitions="180,*,120"
-                                              Margin="0,6">
-                                            <TextBlock Text="{Binding DisplayName}"
-                                                       Foreground="#D8E1EA"
-                                                       FontWeight="SemiBold"/>
-                                            <TextBlock Grid.Column="1"
-                                                       Text="{Binding Description}"
-                                                       Foreground="#9AAABD"
-                                                       TextWrapping="Wrap"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="{Binding Status}"
-                                                       Foreground="#B7D7F2"
-                                                       HorizontalAlignment="Right"/>
-                                        </Grid>
+                                    <DataTemplate x:DataType="vm:WindowRowViewModel">
+                                        <Border Background="#11171D"
+                                                BorderBrush="#253240"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Padding="12"
+                                                Margin="0,0,0,8">
+                                            <Grid ColumnDefinitions="2.5*,1.1*,80,110,90,130"
+                                                  ColumnSpacing="12"
+                                                  VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Title}"
+                                                           Foreground="#F4F7FA"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           ToolTip.Tip="{Binding Title}"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding ProcessName}"
+                                                           Foreground="#D8E1EA"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding ProcessId}"
+                                                           Foreground="#9AAABD"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="{Binding HandleHex}"
+                                                           Foreground="#9AAABD"/>
+                                                <TextBlock Grid.Column="4"
+                                                           Text="{Binding Status}"
+                                                           Foreground="#B7D7F2"
+                                                           FontWeight="SemiBold"/>
+                                                <StackPanel Grid.Column="5"
+                                                            Orientation="Horizontal"
+                                                            Spacing="8">
+                                                    <Button Content="Pin"
+                                                            Command="{Binding PinCommand}"
+                                                            IsVisible="{Binding CanPin}"/>
+                                                    <Button Content="Unpin"
+                                                            Command="{Binding UnpinCommand}"
+                                                            IsVisible="{Binding CanUnpin}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+
+                            <Border Background="#11171D"
+                                    BorderBrush="#253240"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="18"
+                                    IsVisible="{Binding ShowNoWindowsEmptyState}">
+                                <TextBlock Text="No windows found. Try refreshing the list."
+                                           Foreground="#9AAABD"/>
+                            </Border>
+
+                            <Border Background="#11171D"
+                                    BorderBrush="#253240"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="18"
+                                    IsVisible="{Binding ShowNoSearchResultsEmptyState}">
+                                <TextBlock Text="No windows match your search."
+                                           Foreground="#9AAABD"/>
+                            </Border>
                         </StackPanel>
                     </Border>
-                </Grid>
+                </StackPanel>
+
+                <Border IsVisible="{Binding IsPlaceholderModuleSelected}"
+                        Background="#161D24"
+                        BorderBrush="#273442"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="18">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Module Workspace"
+                                   Foreground="#F4F7FA"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="This module is prepared in the shell and will be implemented in a later stage."
+                                   Foreground="#9AAABD"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -14,8 +14,8 @@ public static class AppModuleCatalog
         new(
             "window-manager",
             "Window Manager",
-            "Tools for pinning, arranging, and managing desktop windows.",
-            "Planned"),
+            "Manage open windows and pin important windows above others.",
+            "Active"),
         new(
             "performance-profiles",
             "Performance Profiles",

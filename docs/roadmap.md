@@ -7,7 +7,7 @@ NordControl is planned as a staged personal Windows desktop control center. Each
 - Bootstrap solution and repository structure
 - Build the initial UI shell
 - Prepare Window Manager module structure
-- Implement pin and unpin windows
+- Implement pin and unpin windows with topmost window support
 
 ## Stage 2
 
