@@ -6,6 +6,12 @@ public sealed class CustomizationSettings
 
     public string SelectedPresetKey { get; set; } = "fluent-dark";
 
+    public string SelectedThemePackageKey { get; set; } = "fluent-dark";
+
+    public string LastExportedThemePath { get; set; } = string.Empty;
+
+    public bool ApplyThemeToNordControlShell { get; set; } = true;
+
     public string NordControlAccentColorHex { get; set; } = "#4CC2FF";
 
     public bool EnableGlassStyleInApp { get; set; } = true;
@@ -23,6 +29,13 @@ public sealed class CustomizationSettings
         {
             SelectedPresetKey = "fluent-dark";
         }
+
+        if (!NordControl.Core.Modules.ThemePackageCatalog.IsKnownThemeKey(SelectedThemePackageKey))
+        {
+            SelectedThemePackageKey = NordControl.Core.Modules.ThemePackageCatalog.DefaultThemePackageKey;
+        }
+
+        LastExportedThemePath ??= string.Empty;
 
         if (!HexColorValidator.IsValidHexColor(NordControlAccentColorHex))
         {

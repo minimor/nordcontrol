@@ -55,6 +55,15 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
     private string selectedCustomizationPresetKey = "fluent-dark";
 
     [ObservableProperty]
+    private string selectedThemePackageKey = "fluent-dark";
+
+    [ObservableProperty]
+    private string lastExportedThemePath = string.Empty;
+
+    [ObservableProperty]
+    private bool applyThemeToNordControlShell = true;
+
+    [ObservableProperty]
     private string currentCustomizationSectionName = "Overview";
 
     [ObservableProperty]
@@ -108,6 +117,11 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
         ConfirmBeforePinning = settings.WindowManager.ConfirmBeforePinning;
         ShowUnknownProcesses = settings.WindowManager.ShowUnknownProcesses;
         SelectedCustomizationPresetKey = settings.Customization.SelectedPresetKey;
+        SelectedThemePackageKey = settings.Customization.SelectedThemePackageKey;
+        LastExportedThemePath = string.IsNullOrWhiteSpace(settings.Customization.LastExportedThemePath)
+            ? "No theme exported yet."
+            : settings.Customization.LastExportedThemePath;
+        ApplyThemeToNordControlShell = settings.Customization.ApplyThemeToNordControlShell;
         CurrentCustomizationSectionName = customizationViewModel.CurrentCustomizationSectionName;
         NordControlAccentColorHex = settings.Customization.NordControlAccentColorHex;
         EnableGlassStyleInApp = settings.Customization.EnableGlassStyleInApp;
@@ -126,6 +140,8 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
         settings.WindowManager.ConfirmBeforePinning = ConfirmBeforePinning;
         settings.WindowManager.ShowUnknownProcesses = ShowUnknownProcesses;
         settings.Customization.SelectedPresetKey = SelectedCustomizationPresetKey;
+        settings.Customization.SelectedThemePackageKey = SelectedThemePackageKey;
+        settings.Customization.ApplyThemeToNordControlShell = ApplyThemeToNordControlShell;
         settings.Customization.NordControlAccentColorHex = NordControlAccentColorHex;
         settings.Customization.EnableGlassStyleInApp = EnableGlassStyleInApp;
         settings.Customization.AllowLowRiskWindowsPersonalization = AllowLowRiskWindowsPersonalization;

@@ -14,23 +14,30 @@ namespace NordControl.App.ViewModels.Customization;
 public partial class CustomizationViewModel : ViewModelBase, IDisposable
 {
     private readonly IAppStateService appStateService;
+    private readonly IThemePackageService themePackageService;
     private readonly IWindowsPersonalizationService windowsPersonalizationService;
     private bool isApplyingSettings;
 
     public CustomizationViewModel()
         : this(
             new AppStateService(new DesignTimeAppSettingsService()),
+            new JsonThemePackageService(),
             new DesignTimeWindowsPersonalizationService())
     {
     }
 
     public CustomizationViewModel(
         IAppStateService appStateService,
+        IThemePackageService themePackageService,
         IWindowsPersonalizationService windowsPersonalizationService)
     {
         this.appStateService = appStateService;
+        this.themePackageService = themePackageService;
         this.windowsPersonalizationService = windowsPersonalizationService;
 
+        ThemePackages = this.themePackageService.GetBuiltInThemes()
+            .Select(theme => new ThemePackageViewModel(theme, PreviewThemePackage, ApplyThemePackage, ExportThemePackage))
+            .ToList();
         CustomizationPresets = CustomizationPresetCatalog.DefaultPresets
             .Select(preset => new CustomizationPresetViewModel(preset, ApplyCustomizationPreset))
             .ToList();
@@ -42,6 +49,8 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         ApplySettings();
         LoadPersonalizationState();
     }
+
+    public IReadOnlyList<ThemePackageViewModel> ThemePackages { get; }
 
     public IReadOnlyList<CustomizationPresetViewModel> CustomizationPresets { get; }
 
@@ -76,6 +85,18 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
 
     [ObservableProperty]
     private string selectedCustomizationPresetKey = "fluent-dark";
+
+    [ObservableProperty]
+    private string selectedThemePackageKey = "fluent-dark";
+
+    [ObservableProperty]
+    private string selectedThemePackageName = "Fluent Dark";
+
+    [ObservableProperty]
+    private string lastExportedThemePath = string.Empty;
+
+    [ObservableProperty]
+    private bool applyThemeToNordControlShell = true;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentCustomizationSectionName))]
@@ -194,15 +215,19 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         isApplyingSettings = true;
 
         SelectedCustomizationPresetKey = customizationSettings.SelectedPresetKey;
+        SelectedThemePackageKey = customizationSettings.SelectedThemePackageKey;
         SelectedCustomizationSection = CustomizationSections
             .FirstOrDefault(section => section.Key == customizationSettings.LastSelectedSectionKey)
             ?? CustomizationSections.FirstOrDefault(section => section.Key == CustomizationSectionCatalog.DefaultSectionKey)
             ?? CustomizationSections.FirstOrDefault();
+        LastExportedThemePath = customizationSettings.LastExportedThemePath;
+        ApplyThemeToNordControlShell = customizationSettings.ApplyThemeToNordControlShell;
         NordControlAccentColorHex = customizationSettings.NordControlAccentColorHex;
         EnableGlassStyleInApp = customizationSettings.EnableGlassStyleInApp;
         AllowLowRiskWindowsPersonalization = customizationSettings.AllowLowRiskWindowsPersonalization;
 
         isApplyingSettings = false;
+        RefreshSelectedThemeState();
         RefreshCustomizationFeatureCards();
     }
 
@@ -262,6 +287,75 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         PersonalizationStatusMessage = $"{preset.Name} applied to NordControl preview and saved.";
     }
 
+    private void PreviewThemePackage(ThemePackageViewModel themePackage)
+    {
+        ApplyThemePackageToPreview(themePackage.Theme, updateSelection: false);
+        PersonalizationStatusMessage = $"{themePackage.Name} preview loaded. Apply it to save this theme package.";
+    }
+
+    private void ApplyThemePackage(ThemePackageViewModel themePackage)
+    {
+        ApplyThemePackageToPreview(themePackage.Theme, updateSelection: true);
+
+        var customizationSettings = appStateService.Settings.Customization;
+        customizationSettings.SelectedThemePackageKey = themePackage.Key;
+        customizationSettings.NordControlAccentColorHex = themePackage.AccentColorHex;
+        customizationSettings.EnableGlassStyleInApp = themePackage.EnableGlass;
+        customizationSettings.ApplyThemeToNordControlShell = ApplyThemeToNordControlShell;
+
+        if (CustomizationPresets.Any(preset => preset.Key == themePackage.Key))
+        {
+            customizationSettings.SelectedPresetKey = themePackage.Key;
+            SelectedCustomizationPresetKey = themePackage.Key;
+        }
+
+        appStateService.Save();
+        PersonalizationStatusMessage = $"{themePackage.Name} theme package applied and saved.";
+    }
+
+    private void ExportThemePackage(ThemePackageViewModel themePackage)
+    {
+        var filePath = GetDefaultThemeExportPath(themePackage.Key);
+        var result = themePackageService.ExportTheme(themePackage.Theme, filePath);
+
+        PersonalizationStatusMessage = result.Success
+            ? $"{result.Message} {result.FilePath}"
+            : result.Message;
+
+        if (result.Success && result.FilePath is not null)
+        {
+            LastExportedThemePath = result.FilePath;
+            appStateService.Settings.Customization.LastExportedThemePath = result.FilePath;
+            appStateService.Save();
+        }
+    }
+
+    private void ApplyThemePackageToPreview(ThemePackage themePackage, bool updateSelection)
+    {
+        var normalizedTheme = themePackageService.Normalize(themePackage);
+
+        if (updateSelection)
+        {
+            SelectedThemePackageKey = normalizedTheme.Key;
+            SelectedThemePackageName = normalizedTheme.Name;
+        }
+        else
+        {
+            SelectedThemePackageName = $"{normalizedTheme.Name} preview";
+        }
+
+        if (ApplyThemeToNordControlShell)
+        {
+            NordControlAccentColorHex = normalizedTheme.AccentColorHex;
+            EnableGlassStyleInApp = normalizedTheme.EnableGlass;
+        }
+
+        if (updateSelection)
+        {
+            RefreshSelectedThemeState();
+        }
+    }
+
     private void SelectCustomizationSection(CustomizationSectionViewModel section)
     {
         SelectedCustomizationSection = section;
@@ -276,6 +370,28 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         {
             CurrentCustomizationFeatureCards.Add(new CustomizationFeatureCardViewModel(card));
         }
+    }
+
+    private void RefreshSelectedThemeState()
+    {
+        var selectedTheme = themePackageService.GetSelectedTheme(appStateService.Settings);
+        SelectedThemePackageName = selectedTheme.Name;
+
+        foreach (var themePackage in ThemePackages)
+        {
+            themePackage.IsSelected = string.Equals(
+                themePackage.Key,
+                SelectedThemePackageKey,
+                StringComparison.Ordinal);
+        }
+    }
+
+    private string GetDefaultThemeExportPath(string themeKey)
+    {
+        var settingsDirectory = Path.GetDirectoryName(appStateService.SettingsFilePath)
+            ?? Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+        return Path.Combine(settingsDirectory, "themes", $"{themeKey}.json");
     }
 
     private void OnSettingsChanged(object? sender, EventArgs e)

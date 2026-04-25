@@ -48,6 +48,7 @@ public partial class App : Application
         services.AddSingleton<IPlatformInfoService, WindowsPlatformInfoService>();
         services.AddSingleton<IWindowManagerService, WindowsWindowManagerService>();
         services.AddSingleton<IWindowsPersonalizationService, WindowsPersonalizationService>();
+        services.AddSingleton<IThemePackageService, JsonThemePackageService>();
         services.AddSingleton<IAppStateService, AppStateService>();
         services.AddSingleton<WindowManagerViewModel>();
         services.AddSingleton<DashboardViewModel>();

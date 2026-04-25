@@ -106,6 +106,27 @@
                 </Grid>
                 <Grid ColumnDefinitions="220,*"
                       ColumnSpacing="12">
+                    <TextBlock Text="Theme package"
+                               Foreground="#D8E1EA"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding SelectedThemePackageKey}"
+                               Foreground="#B7D7F2"
+                               VerticalAlignment="Center"/>
+                </Grid>
+                <Grid ColumnDefinitions="220,*"
+                      ColumnSpacing="12">
+                    <TextBlock Text="Last exported theme"
+                               Foreground="#D8E1EA"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding LastExportedThemePath}"
+                               Foreground="#B7D7F2"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"/>
+                </Grid>
+                <Grid ColumnDefinitions="220,*"
+                      ColumnSpacing="12">
                     <TextBlock Text="Customization section"
                                Foreground="#D8E1EA"
                                VerticalAlignment="Center"/>
@@ -114,6 +135,8 @@
                                Foreground="#B7D7F2"
                                VerticalAlignment="Center"/>
                 </Grid>
+                <CheckBox Content="Apply theme packages to NordControl shell preview"
+                          IsChecked="{Binding ApplyThemeToNordControlShell, Mode=TwoWay}"/>
                 <Grid ColumnDefinitions="220,*"
                       ColumnSpacing="12">
                     <TextBlock Text="NordControl accent"

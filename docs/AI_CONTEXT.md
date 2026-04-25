@@ -36,6 +36,7 @@ The app currently includes:
 - Persistent app settings.
 - Settings page.
 - Customization Studio.
+- Theme Package system with built-in packages and JSON export.
 - Customization internal sections:
   - Overview
   - Themes
@@ -48,6 +49,7 @@ The app currently includes:
   - Advanced / Risk Lab
 - Windows personalization safe controls for current-user apps/system theme, transparency, and title-bar accent.
 - Preset gallery and desktop environment roadmap cards.
+- Theme package gallery in the Customization Themes subsection.
 
 ## Existing Modules
 
@@ -65,6 +67,7 @@ The app currently includes:
 - `NordControl.App/ViewModels/WindowManager/WindowManagerViewModel.cs`
 - `NordControl.App/ViewModels/Settings/SettingsViewModel.cs`
 - `NordControl.App/ViewModels/Customization/CustomizationViewModel.cs`
+- `NordControl.App/ViewModels/Customization/ThemePackageViewModel.cs`
 - `NordControl.App/Views/MainWindow.axaml`
 - `NordControl.App/Views/Dashboard/DashboardView.axaml`
 - `NordControl.App/Views/WindowManager/WindowManagerView.axaml`
@@ -73,6 +76,10 @@ The app currently includes:
 - `NordControl.App/Services/AppStateService.cs`
 - `NordControl.Core/Models/AppSettings.cs`
 - `NordControl.Core/Models/CustomizationSettings.cs`
+- `NordControl.Core/Models/ThemePackage.cs`
+- `NordControl.Core/Modules/ThemePackageCatalog.cs`
+- `NordControl.Core/Services/IThemePackageService.cs`
+- `NordControl.Core/Services/JsonThemePackageService.cs`
 - `NordControl.Core/Modules/CustomizationSectionCatalog.cs`
 - `NordControl.Core/Modules/CustomizationPresetCatalog.cs`
 - `NordControl.Windows/Services/WindowsWindowManagerService.cs`
@@ -95,6 +102,9 @@ Current settings include:
 - Last selected global module
 - Window Manager settings
 - Customization selected preset
+- Customization selected theme package
+- Last exported theme package path
+- Whether theme packages should update the NordControl shell preview
 - Customization selected subsection
 - NordControl accent color
 - Glass-style preview setting
@@ -106,6 +116,7 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 
 - `MainWindowViewModel` and `MainWindow.axaml` now act as shell/navigation host; module behavior lives in page-specific view models and views.
 - Customization taskbar, Start menu, widget, launcher, layout, and Risk Lab sections are planning UI only.
+- Imported theme package UI is not implemented yet; JSON export is available from built-in package cards.
 - System accent color and wallpaper changes are not implemented.
 - No global hotkeys yet.
 - No autopin rules yet.
@@ -116,7 +127,7 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 
 ## Next Priorities
 
-1. Add theme package models and import/export.
+1. Add theme package import UI and custom theme editing.
 2. Improve app-level theme preview and visual state.
 3. Research safe taskbar customization without Explorer patching.
 4. Add Desktop Widgets overlay architecture.

@@ -18,6 +18,9 @@ public sealed class AppSettingsTests
         Assert.True(settings.WindowManager.ShowUnknownProcesses);
         Assert.Equal("overview", settings.Customization.LastSelectedSectionKey);
         Assert.Equal("fluent-dark", settings.Customization.SelectedPresetKey);
+        Assert.Equal("fluent-dark", settings.Customization.SelectedThemePackageKey);
+        Assert.Equal(string.Empty, settings.Customization.LastExportedThemePath);
+        Assert.True(settings.Customization.ApplyThemeToNordControlShell);
         Assert.Equal("#4CC2FF", settings.Customization.NordControlAccentColorHex);
         Assert.True(settings.Customization.EnableGlassStyleInApp);
         Assert.True(settings.Customization.AllowLowRiskWindowsPersonalization);
@@ -30,12 +33,14 @@ public sealed class AppSettingsTests
         settings.WindowManager.AutoRefreshIntervalSeconds = -10;
         settings.Customization.LastSelectedSectionKey = "not-a-section";
         settings.Customization.NordControlAccentColorHex = "blue-ish";
+        settings.Customization.SelectedThemePackageKey = "missing-theme";
 
         settings.Normalize();
 
         Assert.Equal(0, settings.WindowManager.AutoRefreshIntervalSeconds);
         Assert.Equal("overview", settings.Customization.LastSelectedSectionKey);
         Assert.Equal("#4CC2FF", settings.Customization.NordControlAccentColorHex);
+        Assert.Equal("fluent-dark", settings.Customization.SelectedThemePackageKey);
     }
 
     [Fact]
