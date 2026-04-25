@@ -32,5 +32,6 @@ NordControl is planned as a staged personal Windows desktop control center. Each
 ## Stage 5
 
 - Add Windows customization module
+- Add Customization Studio preset gallery
 - Group customization options by risk and reversibility
 - Add rollback support before applying deeper changes

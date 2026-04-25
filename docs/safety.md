@@ -10,6 +10,7 @@ NordControl should be useful without becoming a fake optimizer or risky tweak bu
 - Avoid fake optimizer behavior such as vague cleanup claims, placebo toggles, or one-click mystery fixes.
 - Keep Windows-specific operations isolated in `NordControl.Windows`.
 - Treat destructive actions as workflows with confirmation, logs, and undo paths.
+- Customization features must avoid Explorer patching, system DLL modifications, process injection, background service installation, and risky registry edits.
 
 ## Rollback Direction
 

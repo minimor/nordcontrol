@@ -395,6 +395,297 @@
                     </Border>
                 </StackPanel>
 
+                <StackPanel IsVisible="{Binding IsCustomizationSelected}" Spacing="18">
+                    <Border Background="#18202A"
+                            BorderBrush="#3B5268"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20">
+                        <Grid ColumnDefinitions="*,220"
+                              ColumnSpacing="20">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Customization Studio"
+                                           Foreground="#F4F7FA"
+                                           FontSize="24"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="Make Windows feel more personal, modern and enjoyable."
+                                           Foreground="#AFC2D3"
+                                           FontSize="14"
+                                           TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding PersonalizationStatusMessage}"
+                                           Foreground="#8CF5D2"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <Border Grid.Column="1"
+                                    Background="#111821"
+                                    BorderBrush="#435A73"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="16">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="NordControl Accent"
+                                               Foreground="#8FA1B3"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"/>
+                                    <Border Background="{Binding NordControlAccentColorHex}"
+                                            Height="42"
+                                            CornerRadius="8"/>
+                                    <TextBlock Text="{Binding NordControlAccentColorHex}"
+                                               Foreground="#F4F7FA"
+                                               FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,*,*"
+                          RowDefinitions="Auto,Auto"
+                          ColumnSpacing="14"
+                          RowSpacing="14">
+                        <Border Background="#161D24"
+                                BorderBrush="#2C3C4E"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Apps Theme"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding AppsTheme}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1"
+                                Background="#161D24"
+                                BorderBrush="#2C3C4E"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="System Theme"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SystemTheme}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2"
+                                Background="#161D24"
+                                BorderBrush="#2C3C4E"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Transparency"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding TransparencyEffectsEnabled}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Row="1"
+                                Background="#161D24"
+                                BorderBrush="#2C3C4E"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Accent Color"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Background="{Binding WindowsAccentColorHex}"
+                                            Width="32"
+                                            Height="32"
+                                            CornerRadius="8"/>
+                                    <TextBlock Text="{Binding WindowsAccentColorHex}"
+                                               Foreground="#F4F7FA"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Row="1"
+                                Grid.Column="1"
+                                Background="#161D24"
+                                BorderBrush="#2C3C4E"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Accent on Title Bars"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding AccentColorOnTitleBars}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Row="1"
+                                Grid.Column="2"
+                                Background="#161D24"
+                                BorderBrush="#2C3C4E"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Last Loaded"
+                                           Foreground="#8FA1B3"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding PersonalizationLastLoadedText}"
+                                           Foreground="#F4F7FA"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Background="#161D24"
+                            BorderBrush="#2C3C4E"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Wallpaper"
+                                       Foreground="#8FA1B3"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding WallpaperPath}"
+                                       Foreground="#D8E1EA"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*"
+                          ColumnSpacing="10">
+                        <Button Content="Refresh current style"
+                                Command="{Binding RefreshPersonalizationCommand}"/>
+                        <Button Grid.Column="1"
+                                Content="Toggle apps theme"
+                                Command="{Binding ToggleAppsThemeCommand}"/>
+                        <Button Grid.Column="2"
+                                Content="Toggle system theme"
+                                Command="{Binding ToggleSystemThemeCommand}"/>
+                        <Button Grid.Column="3"
+                                Content="Toggle transparency"
+                                Command="{Binding ToggleTransparencyEffectsCommand}"/>
+                        <Button Grid.Column="4"
+                                Content="Toggle title-bar accent"
+                                Command="{Binding ToggleAccentColorOnTitleBarsCommand}"/>
+                    </Grid>
+
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Preset Gallery"
+                                   Foreground="#F4F7FA"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"/>
+                        <ItemsControl ItemsSource="{Binding CustomizationPresets}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:CustomizationPresetViewModel">
+                                    <Border Width="250"
+                                            MinHeight="210"
+                                            Margin="0,0,14,14"
+                                            Background="#151D27"
+                                            BorderBrush="#304459"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="16">
+                                        <StackPanel Spacing="10">
+                                            <Grid ColumnDefinitions="*,42">
+                                                <TextBlock Text="{Binding Name}"
+                                                           Foreground="#F4F7FA"
+                                                           FontSize="18"
+                                                           FontWeight="SemiBold"/>
+                                                <Border Grid.Column="1"
+                                                        Background="{Binding AccentColorHex}"
+                                                        Width="34"
+                                                        Height="34"
+                                                        CornerRadius="8"/>
+                                            </Grid>
+                                            <TextBlock Text="{Binding Description}"
+                                                       Foreground="#AFC2D3"
+                                                       TextWrapping="Wrap"
+                                                       MinHeight="52"/>
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <TextBlock Text="{Binding StyleMood}"
+                                                           Foreground="#8CF5D2"
+                                                           FontWeight="SemiBold"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding RiskLevel}"
+                                                           Foreground="#FFD166"/>
+                                            </Grid>
+                                            <TextBlock Text="{Binding BackgroundHint}"
+                                                       Foreground="#8FA1B3"/>
+                                            <Button Content="Preview / Apply to NordControl"
+                                                    Command="{Binding ApplyCommand}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="16">
+                        <Border Background="#16251F"
+                                BorderBrush="#2D705D"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Safety Notes"
+                                           Foreground="#F4F7FA"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="Safe changes only. No Explorer patching, no system DLL modifications, no process injection, and no risky optimizer behavior."
+                                           Foreground="#BEEBDD"
+                                           TextWrapping="Wrap"/>
+                                <TextBlock Text="Riskier features will require explicit confirmation, logs, and rollback planning in future versions."
+                                           Foreground="#8FA1B3"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Background="#1F1A2C"
+                                BorderBrush="#57427A"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Future Features"
+                                           Foreground="#F4F7FA"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="Transparent taskbar, Start menu experiments, desktop widgets, window border styles, per-app visual profiles, and a custom command palette."
+                                           Foreground="#D9C8FF"
+                                           TextWrapping="Wrap"/>
+                                <TextBlock Text="These are planned, not implemented."
+                                           Foreground="#8FA1B3"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+
                 <StackPanel IsVisible="{Binding IsSettingsSelected}" Spacing="18">
                     <Border Background="#161D24"
                             BorderBrush="#273442"
@@ -473,6 +764,42 @@
 
                             <CheckBox Content="Show unknown processes"
                                       IsChecked="{Binding ShowUnknownProcesses, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#161D24"
+                            BorderBrush="#273442"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="18">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="Customization"
+                                       Foreground="#F4F7FA"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"/>
+                            <Grid ColumnDefinitions="220,*"
+                                  ColumnSpacing="12">
+                                <TextBlock Text="Selected preset"
+                                           Foreground="#D8E1EA"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding SelectedCustomizationPresetKey}"
+                                           Foreground="#B7D7F2"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="220,*"
+                                  ColumnSpacing="12">
+                                <TextBlock Text="NordControl accent"
+                                           Foreground="#D8E1EA"
+                                           VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding NordControlAccentColorHex, Mode=TwoWay}"
+                                         MinHeight="34"/>
+                            </Grid>
+                            <CheckBox Content="Enable glass style in NordControl preview"
+                                      IsChecked="{Binding EnableGlassStyleInApp, Mode=TwoWay}"/>
+                            <CheckBox Content="Allow low-risk Windows personalization actions"
+                                      IsChecked="{Binding AllowLowRiskWindowsPersonalization, Mode=TwoWay}"/>
                         </StackPanel>
                     </Border>
 

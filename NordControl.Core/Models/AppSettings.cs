@@ -8,6 +8,8 @@ public sealed class AppSettings
 
     public WindowManagerSettings WindowManager { get; set; } = new();
 
+    public CustomizationSettings Customization { get; set; } = new();
+
     public static AppSettings CreateDefault()
     {
         return new AppSettings();
@@ -27,5 +29,8 @@ public sealed class AppSettings
 
         WindowManager ??= new WindowManagerSettings();
         WindowManager.Normalize();
+
+        Customization ??= new CustomizationSettings();
+        Customization.Normalize();
     }
 }

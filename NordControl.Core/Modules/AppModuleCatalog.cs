@@ -24,8 +24,8 @@ public static class AppModuleCatalog
         new(
             "customization",
             "Customization",
-            "A safe home for visual and behavior tweaks for Windows.",
-            "Planned"),
+            "Make Windows feel more personal, modern and enjoyable.",
+            "Studio"),
         new(
             "settings",
             "Settings",

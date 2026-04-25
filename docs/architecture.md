@@ -14,6 +14,8 @@ The Window Manager follows this boundary: `NordControl.Core` defines `WindowInfo
 
 Settings follow the same dependency direction. `NordControl.Core` defines `AppSettings`, `WindowManagerSettings`, and `IAppSettingsService`; `NordControl.Windows` provides a JSON file implementation that stores data under the user's AppData folder; `NordControl.App` exposes the settings through view model properties and the Settings page.
 
+Customization follows the platform boundary as well. `NordControl.Core` defines personalization state, operation results, preset models, and `IWindowsPersonalizationService`; `NordControl.Windows` owns current-user Windows personalization reads and low-risk writes; `NordControl.App` owns the Customization Studio UI, preview state, and preset gallery.
+
 `NordControl.Tests` contains tests for non-UI logic. Core behavior should be tested here first. Windows services can also be tested when they expose deterministic behavior or safe environment reads.
 
 ## Dependency Direction

@@ -18,6 +18,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly IAppSettingsService appSettingsService;
     private readonly IPlatformInfoService platformInfoService;
     private readonly IWindowManagerService windowManagerService;
+    private readonly IWindowsPersonalizationService windowsPersonalizationService;
     private IReadOnlyList<WindowInfo> allWindows = [];
     private AppSettings currentSettings = AppSettings.CreateDefault();
     private DispatcherTimer? autoRefreshTimer;
@@ -25,26 +26,36 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private bool isRefreshingWindows;
 
     public MainWindowViewModel()
-        : this(new DesignTimeAppSettingsService(), new DesignTimePlatformInfoService(), new DesignTimeWindowManagerService())
+        : this(
+            new DesignTimeAppSettingsService(),
+            new DesignTimePlatformInfoService(),
+            new DesignTimeWindowManagerService(),
+            new DesignTimeWindowsPersonalizationService())
     {
     }
 
     public MainWindowViewModel(
         IAppSettingsService appSettingsService,
         IPlatformInfoService platformInfoService,
-        IWindowManagerService windowManagerService)
+        IWindowManagerService windowManagerService,
+        IWindowsPersonalizationService windowsPersonalizationService)
     {
         this.appSettingsService = appSettingsService;
         this.platformInfoService = platformInfoService;
         this.windowManagerService = windowManagerService;
+        this.windowsPersonalizationService = windowsPersonalizationService;
 
         Modules = AppModuleCatalog.DefaultModules
             .Select(module => new ShellModuleViewModel(module))
+            .ToList();
+        CustomizationPresets = CustomizationPresetCatalog.DefaultPresets
+            .Select(preset => new CustomizationPresetViewModel(preset, ApplyCustomizationPreset))
             .ToList();
 
         PlatformInfo = this.platformInfoService.GetPlatformInfo();
         SettingsFilePath = this.appSettingsService.SettingsFilePath;
         LoadSettingsIntoEditor(selectSavedModule: true);
+        LoadPersonalizationState();
 
         if (currentSettings.WindowManager.RefreshOnStartup)
         {
@@ -67,6 +78,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     public ObservableCollection<WindowRowViewModel> FilteredWindows { get; } = [];
 
+    public IReadOnlyList<CustomizationPresetViewModel> CustomizationPresets { get; }
+
     public string SettingsFilePath { get; }
 
     [ObservableProperty]
@@ -75,6 +88,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [NotifyPropertyChangedFor(nameof(ActiveModuleStatus))]
     [NotifyPropertyChangedFor(nameof(IsDashboardSelected))]
     [NotifyPropertyChangedFor(nameof(IsWindowManagerSelected))]
+    [NotifyPropertyChangedFor(nameof(IsCustomizationSelected))]
     [NotifyPropertyChangedFor(nameof(IsSettingsSelected))]
     [NotifyPropertyChangedFor(nameof(IsPlaceholderModuleSelected))]
     private ShellModuleViewModel? selectedModule;
@@ -103,6 +117,43 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     [ObservableProperty]
     private bool showUnknownProcesses = true;
+
+    [ObservableProperty]
+    private string personalizationStatusMessage = "Customization Studio ready.";
+
+    [ObservableProperty]
+    private string appsTheme = "Unknown";
+
+    [ObservableProperty]
+    private string systemTheme = "Unknown";
+
+    [ObservableProperty]
+    private bool transparencyEffectsEnabled;
+
+    [ObservableProperty]
+    private string windowsAccentColorHex = "#4CC2FF";
+
+    [ObservableProperty]
+    private bool accentColorOnTitleBars;
+
+    [ObservableProperty]
+    private string wallpaperPath = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PersonalizationLastLoadedText))]
+    private DateTime? personalizationLastLoadedAt;
+
+    [ObservableProperty]
+    private string selectedCustomizationPresetKey = "fluent-dark";
+
+    [ObservableProperty]
+    private string nordControlAccentColorHex = "#4CC2FF";
+
+    [ObservableProperty]
+    private bool enableGlassStyleInApp = true;
+
+    [ObservableProperty]
+    private bool allowLowRiskWindowsPersonalization = true;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(LastRefreshText))]
@@ -134,10 +185,12 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     public bool IsWindowManagerSelected => SelectedModule?.Key == "window-manager";
 
+    public bool IsCustomizationSelected => SelectedModule?.Key == "customization";
+
     public bool IsSettingsSelected => SelectedModule?.Key == "settings";
 
     public bool IsPlaceholderModuleSelected =>
-        !IsDashboardSelected && !IsWindowManagerSelected && !IsSettingsSelected;
+        !IsDashboardSelected && !IsWindowManagerSelected && !IsCustomizationSelected && !IsSettingsSelected;
 
     public bool HasFilteredWindows => FilteredWindowCount > 0;
 
@@ -152,6 +205,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public string AutoRefreshStatus => AutoRefreshIntervalSeconds <= 0
         ? "Auto-refresh disabled."
         : $"Auto-refresh every {AutoRefreshIntervalSeconds} seconds.";
+
+    public string PersonalizationLastLoadedText =>
+        PersonalizationLastLoadedAt?.ToString("HH:mm:ss") ?? "Not loaded";
 
     partial void OnSelectedModuleChanged(ShellModuleViewModel? value)
     {
@@ -176,6 +232,58 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private void ClearSearch()
     {
         SearchText = string.Empty;
+    }
+
+    [RelayCommand]
+    private void RefreshPersonalization()
+    {
+        LoadPersonalizationState();
+    }
+
+    [RelayCommand]
+    private void ToggleAppsTheme()
+    {
+        if (!CanApplyLowRiskWindowsPersonalization())
+        {
+            return;
+        }
+
+        var nextTheme = AppsTheme.Equals("Dark", StringComparison.OrdinalIgnoreCase) ? "Light" : "Dark";
+        ApplyPersonalizationOperation(windowsPersonalizationService.SetAppsTheme(nextTheme));
+    }
+
+    [RelayCommand]
+    private void ToggleSystemTheme()
+    {
+        if (!CanApplyLowRiskWindowsPersonalization())
+        {
+            return;
+        }
+
+        var nextTheme = SystemTheme.Equals("Dark", StringComparison.OrdinalIgnoreCase) ? "Light" : "Dark";
+        ApplyPersonalizationOperation(windowsPersonalizationService.SetSystemTheme(nextTheme));
+    }
+
+    [RelayCommand]
+    private void ToggleTransparencyEffects()
+    {
+        if (!CanApplyLowRiskWindowsPersonalization())
+        {
+            return;
+        }
+
+        ApplyPersonalizationOperation(windowsPersonalizationService.SetTransparencyEffects(!TransparencyEffectsEnabled));
+    }
+
+    [RelayCommand]
+    private void ToggleAccentColorOnTitleBars()
+    {
+        if (!CanApplyLowRiskWindowsPersonalization())
+        {
+            return;
+        }
+
+        ApplyPersonalizationOperation(windowsPersonalizationService.SetAccentColorOnTitleBars(!AccentColorOnTitleBars));
     }
 
     [RelayCommand]
@@ -315,6 +423,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         AutoRefreshIntervalSeconds = currentSettings.WindowManager.AutoRefreshIntervalSeconds;
         ConfirmBeforePinning = currentSettings.WindowManager.ConfirmBeforePinning;
         ShowUnknownProcesses = currentSettings.WindowManager.ShowUnknownProcesses;
+        SelectedCustomizationPresetKey = currentSettings.Customization.SelectedPresetKey;
+        NordControlAccentColorHex = currentSettings.Customization.NordControlAccentColorHex;
+        EnableGlassStyleInApp = currentSettings.Customization.EnableGlassStyleInApp;
+        AllowLowRiskWindowsPersonalization = currentSettings.Customization.AllowLowRiskWindowsPersonalization;
 
         if (selectSavedModule)
         {
@@ -333,8 +445,70 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         currentSettings.WindowManager.AutoRefreshIntervalSeconds = Math.Max(0, AutoRefreshIntervalSeconds);
         currentSettings.WindowManager.ConfirmBeforePinning = ConfirmBeforePinning;
         currentSettings.WindowManager.ShowUnknownProcesses = ShowUnknownProcesses;
+        currentSettings.Customization.SelectedPresetKey = SelectedCustomizationPresetKey;
+        currentSettings.Customization.NordControlAccentColorHex = NordControlAccentColorHex;
+        currentSettings.Customization.EnableGlassStyleInApp = EnableGlassStyleInApp;
+        currentSettings.Customization.AllowLowRiskWindowsPersonalization = AllowLowRiskWindowsPersonalization;
         currentSettings.Normalize();
         AutoRefreshIntervalSeconds = currentSettings.WindowManager.AutoRefreshIntervalSeconds;
+        SelectedCustomizationPresetKey = currentSettings.Customization.SelectedPresetKey;
+        NordControlAccentColorHex = currentSettings.Customization.NordControlAccentColorHex;
+    }
+
+    private void LoadPersonalizationState()
+    {
+        try
+        {
+            var state = windowsPersonalizationService.GetCurrentState();
+            AppsTheme = state.AppsTheme;
+            SystemTheme = state.SystemTheme;
+            TransparencyEffectsEnabled = state.TransparencyEffectsEnabled;
+            WindowsAccentColorHex = state.AccentColorHex;
+            AccentColorOnTitleBars = state.AccentColorOnTitleBars;
+            WallpaperPath = string.IsNullOrWhiteSpace(state.WallpaperPath) ? "Not available" : state.WallpaperPath;
+            PersonalizationLastLoadedAt = state.LastLoadedAt;
+            PersonalizationStatusMessage = "Windows style snapshot refreshed.";
+        }
+        catch (Exception ex)
+        {
+            PersonalizationStatusMessage = $"Could not load Windows style: {ex.Message}";
+        }
+    }
+
+    private void ApplyPersonalizationOperation(PersonalizationOperationResult result)
+    {
+        PersonalizationStatusMessage = result.Success
+            ? result.Message
+            : $"{result.Message}{(string.IsNullOrWhiteSpace(result.Requires) ? string.Empty : $" Requires: {result.Requires}.")}";
+
+        LoadPersonalizationState();
+        if (!result.Success)
+        {
+            PersonalizationStatusMessage = $"{result.Message}{(string.IsNullOrWhiteSpace(result.Requires) ? string.Empty : $" Requires: {result.Requires}.")}";
+        }
+    }
+
+    private bool CanApplyLowRiskWindowsPersonalization()
+    {
+        if (AllowLowRiskWindowsPersonalization)
+        {
+            return true;
+        }
+
+        PersonalizationStatusMessage = "Low-risk Windows personalization is disabled in settings.";
+        return false;
+    }
+
+    private void ApplyCustomizationPreset(CustomizationPresetViewModel preset)
+    {
+        SelectedCustomizationPresetKey = preset.Key;
+        NordControlAccentColorHex = preset.AccentColorHex;
+        EnableGlassStyleInApp = true;
+        currentSettings.Customization.SelectedPresetKey = preset.Key;
+        currentSettings.Customization.NordControlAccentColorHex = preset.AccentColorHex;
+        currentSettings.Customization.EnableGlassStyleInApp = true;
+        appSettingsService.Save(currentSettings);
+        PersonalizationStatusMessage = $"{preset.Name} applied to NordControl preview and saved.";
     }
 
     private void StartOrUpdateAutoRefreshTimer()
@@ -429,6 +603,51 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         public bool IsTopMost(nint hwnd)
         {
             return hwnd == 0x10002;
+        }
+    }
+
+    private sealed class DesignTimeWindowsPersonalizationService : IWindowsPersonalizationService
+    {
+        public WindowsPersonalizationState GetCurrentState()
+        {
+            return new WindowsPersonalizationState(
+                "Dark",
+                "Dark",
+                true,
+                "#4CC2FF",
+                false,
+                @"C:\Windows\Web\Wallpaper\Windows\img0.jpg",
+                DateTime.Now);
+        }
+
+        public PersonalizationOperationResult SetAppsTheme(string theme)
+        {
+            return PersonalizationOperationResult.Succeeded("Design-time apps theme updated.");
+        }
+
+        public PersonalizationOperationResult SetSystemTheme(string theme)
+        {
+            return PersonalizationOperationResult.Succeeded("Design-time system theme updated.");
+        }
+
+        public PersonalizationOperationResult SetTransparencyEffects(bool enabled)
+        {
+            return PersonalizationOperationResult.Succeeded("Design-time transparency updated.");
+        }
+
+        public PersonalizationOperationResult SetAccentColor(string hexColor)
+        {
+            return PersonalizationOperationResult.Failed("Design-time accent color is preview-only.", "App-only");
+        }
+
+        public PersonalizationOperationResult SetAccentColorOnTitleBars(bool enabled)
+        {
+            return PersonalizationOperationResult.Succeeded("Design-time title bar accent updated.");
+        }
+
+        public PersonalizationOperationResult SetWallpaper(string filePath)
+        {
+            return PersonalizationOperationResult.Failed("Design-time wallpaper is preview-only.", "App-only");
         }
     }
 }

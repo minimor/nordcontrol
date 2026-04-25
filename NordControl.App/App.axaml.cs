@@ -41,6 +41,7 @@ public partial class App : Application
         services.AddSingleton<IAppSettingsService, JsonAppSettingsService>();
         services.AddSingleton<IPlatformInfoService, WindowsPlatformInfoService>();
         services.AddSingleton<IWindowManagerService, WindowsWindowManagerService>();
+        services.AddSingleton<IWindowsPersonalizationService, WindowsPersonalizationService>();
         services.AddTransient<MainWindowViewModel>();
 
         return services.BuildServiceProvider();
