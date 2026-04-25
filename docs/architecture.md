@@ -12,6 +12,8 @@ NordControl is split into separate projects so the app can grow without mixing U
 
 The Window Manager follows this boundary: `NordControl.Core` defines `WindowInfo`, `WindowOperationResult`, and `IWindowManagerService`; `NordControl.Windows` implements enumeration and topmost behavior through WinAPI; `NordControl.App` binds the service results to the Dashboard and Window Manager UI.
 
+Settings follow the same dependency direction. `NordControl.Core` defines `AppSettings`, `WindowManagerSettings`, and `IAppSettingsService`; `NordControl.Windows` provides a JSON file implementation that stores data under the user's AppData folder; `NordControl.App` exposes the settings through view model properties and the Settings page.
+
 `NordControl.Tests` contains tests for non-UI logic. Core behavior should be tested here first. Windows services can also be tested when they expose deterministic behavior or safe environment reads.
 
 ## Dependency Direction

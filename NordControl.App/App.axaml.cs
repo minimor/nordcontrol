@@ -38,6 +38,7 @@ public partial class App : Application
     private static ServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
+        services.AddSingleton<IAppSettingsService, JsonAppSettingsService>();
         services.AddSingleton<IPlatformInfoService, WindowsPlatformInfoService>();
         services.AddSingleton<IWindowManagerService, WindowsWindowManagerService>();
         services.AddTransient<MainWindowViewModel>();

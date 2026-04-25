@@ -13,19 +13,24 @@ namespace NordControl.App.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    private readonly IAppSettingsService appSettingsService;
     private readonly IPlatformInfoService platformInfoService;
     private readonly IWindowManagerService windowManagerService;
     private IReadOnlyList<WindowInfo> allWindows = [];
+    private AppSettings currentSettings = AppSettings.CreateDefault();
+    private bool isApplyingSettings;
 
     public MainWindowViewModel()
-        : this(new DesignTimePlatformInfoService(), new DesignTimeWindowManagerService())
+        : this(new DesignTimeAppSettingsService(), new DesignTimePlatformInfoService(), new DesignTimeWindowManagerService())
     {
     }
 
     public MainWindowViewModel(
+        IAppSettingsService appSettingsService,
         IPlatformInfoService platformInfoService,
         IWindowManagerService windowManagerService)
     {
+        this.appSettingsService = appSettingsService;
         this.platformInfoService = platformInfoService;
         this.windowManagerService = windowManagerService;
 
@@ -34,8 +39,18 @@ public partial class MainWindowViewModel : ViewModelBase
             .ToList();
 
         PlatformInfo = this.platformInfoService.GetPlatformInfo();
-        SelectedModule = Modules.FirstOrDefault();
-        RefreshWindows();
+        SettingsFilePath = this.appSettingsService.SettingsFilePath;
+        LoadSettingsIntoEditor(selectSavedModule: true);
+
+        if (currentSettings.WindowManager.RefreshOnStartup)
+        {
+            LoadWindows();
+        }
+        else
+        {
+            WindowOperationMessage = "Window list not loaded. Click Refresh.";
+            ApplyWindowFilter();
+        }
     }
 
     public IReadOnlyList<ShellModuleViewModel> Modules { get; }
@@ -44,12 +59,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<WindowRowViewModel> FilteredWindows { get; } = [];
 
+    public string SettingsFilePath { get; }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ActiveModuleName))]
     [NotifyPropertyChangedFor(nameof(ActiveModuleDescription))]
     [NotifyPropertyChangedFor(nameof(ActiveModuleStatus))]
     [NotifyPropertyChangedFor(nameof(IsDashboardSelected))]
     [NotifyPropertyChangedFor(nameof(IsWindowManagerSelected))]
+    [NotifyPropertyChangedFor(nameof(IsSettingsSelected))]
     [NotifyPropertyChangedFor(nameof(IsPlaceholderModuleSelected))]
     private ShellModuleViewModel? selectedModule;
 
@@ -57,7 +75,25 @@ public partial class MainWindowViewModel : ViewModelBase
     private string searchText = string.Empty;
 
     [ObservableProperty]
-    private string windowOperationMessage = "Window list loaded.";
+    private string windowOperationMessage = "Window list not loaded. Click Refresh.";
+
+    [ObservableProperty]
+    private string settingsStatusMessage = "Settings ready.";
+
+    [ObservableProperty]
+    private string selectedTheme = "Dark";
+
+    [ObservableProperty]
+    private bool refreshOnStartup = true;
+
+    [ObservableProperty]
+    private int autoRefreshIntervalSeconds;
+
+    [ObservableProperty]
+    private bool confirmBeforePinning;
+
+    [ObservableProperty]
+    private bool showUnknownProcesses = true;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(LastRefreshText))]
@@ -89,7 +125,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public bool IsWindowManagerSelected => SelectedModule?.Key == "window-manager";
 
-    public bool IsPlaceholderModuleSelected => !IsDashboardSelected && !IsWindowManagerSelected;
+    public bool IsSettingsSelected => SelectedModule?.Key == "settings";
+
+    public bool IsPlaceholderModuleSelected =>
+        !IsDashboardSelected && !IsWindowManagerSelected && !IsSettingsSelected;
 
     public bool HasFilteredWindows => FilteredWindowCount > 0;
 
@@ -100,6 +139,14 @@ public partial class MainWindowViewModel : ViewModelBase
     public string LastRefreshText => LastWindowRefreshAt?.ToString("HH:mm:ss") ?? "Not refreshed";
 
     public string CurrentProfile => "Normal";
+
+    partial void OnSelectedModuleChanged(ShellModuleViewModel? value)
+    {
+        if (!isApplyingSettings && value is not null)
+        {
+            currentSettings.LastSelectedModuleKey = value.Key;
+        }
+    }
 
     partial void OnSearchTextChanged(string value)
     {
@@ -112,11 +159,50 @@ public partial class MainWindowViewModel : ViewModelBase
         LoadWindows();
     }
 
+    [RelayCommand]
+    private void ClearSearch()
+    {
+        SearchText = string.Empty;
+    }
+
+    [RelayCommand]
+    private void SaveSettings()
+    {
+        WriteEditorToSettings();
+        appSettingsService.Save(currentSettings);
+        SettingsStatusMessage = appSettingsService.LastStatusMessage;
+        ApplyWindowFilter();
+    }
+
+    [RelayCommand]
+    private void ReloadSettings()
+    {
+        LoadSettingsIntoEditor(selectSavedModule: true);
+        ApplyWindowFilter();
+    }
+
+    [RelayCommand]
+    private void ResetSettings()
+    {
+        currentSettings = appSettingsService.ResetToDefaults();
+        ApplySettingsToEditor(selectSavedModule: true);
+        SettingsStatusMessage = appSettingsService.LastStatusMessage;
+        ApplyWindowFilter();
+    }
+
     private void LoadWindows(string? operationMessage = null)
     {
         try
         {
-            allWindows = windowManagerService.GetOpenWindows();
+            var windows = windowManagerService.GetOpenWindows();
+            if (!currentSettings.WindowManager.ShowUnknownProcesses)
+            {
+                windows = windows
+                    .Where(window => !string.Equals(window.ProcessName, "Unknown", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            allWindows = windows;
             OpenWindowCount = allWindows.Count;
             TopMostWindowCount = allWindows.Count(window => window.IsTopMost);
             LastWindowRefreshAt = DateTime.Now;
@@ -132,12 +218,6 @@ public partial class MainWindowViewModel : ViewModelBase
             WindowOperationMessage = $"Could not load windows: {ex.Message}";
             ApplyWindowFilter();
         }
-    }
-
-    [RelayCommand]
-    private void ClearSearch()
-    {
-        SearchText = string.Empty;
     }
 
     private void PinWindow(WindowRowViewModel row)
@@ -170,6 +250,68 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         FilteredWindowCount = FilteredWindows.Count;
+    }
+
+    private void LoadSettingsIntoEditor(bool selectSavedModule)
+    {
+        currentSettings = appSettingsService.Load();
+        ApplySettingsToEditor(selectSavedModule);
+        SettingsStatusMessage = appSettingsService.LastStatusMessage;
+    }
+
+    private void ApplySettingsToEditor(bool selectSavedModule)
+    {
+        currentSettings.Normalize();
+        isApplyingSettings = true;
+
+        SelectedTheme = currentSettings.Theme;
+        RefreshOnStartup = currentSettings.WindowManager.RefreshOnStartup;
+        AutoRefreshIntervalSeconds = currentSettings.WindowManager.AutoRefreshIntervalSeconds;
+        ConfirmBeforePinning = currentSettings.WindowManager.ConfirmBeforePinning;
+        ShowUnknownProcesses = currentSettings.WindowManager.ShowUnknownProcesses;
+
+        if (selectSavedModule)
+        {
+            SelectedModule = Modules.FirstOrDefault(module => module.Key == currentSettings.LastSelectedModuleKey)
+                ?? Modules.FirstOrDefault();
+        }
+
+        isApplyingSettings = false;
+    }
+
+    private void WriteEditorToSettings()
+    {
+        currentSettings.Theme = string.IsNullOrWhiteSpace(SelectedTheme) ? "Dark" : SelectedTheme;
+        currentSettings.LastSelectedModuleKey = SelectedModule?.Key ?? "dashboard";
+        currentSettings.WindowManager.RefreshOnStartup = RefreshOnStartup;
+        currentSettings.WindowManager.AutoRefreshIntervalSeconds = Math.Max(0, AutoRefreshIntervalSeconds);
+        currentSettings.WindowManager.ConfirmBeforePinning = ConfirmBeforePinning;
+        currentSettings.WindowManager.ShowUnknownProcesses = ShowUnknownProcesses;
+        currentSettings.Normalize();
+    }
+
+    private sealed class DesignTimeAppSettingsService : IAppSettingsService
+    {
+        public string SettingsFilePath { get; } = @"%AppData%\NordControl\settings.json";
+
+        public string LastStatusMessage { get; private set; } = "Design-time settings loaded.";
+
+        public AppSettings Load()
+        {
+            LastStatusMessage = "Design-time settings loaded.";
+            return AppSettings.CreateDefault();
+        }
+
+        public void Save(AppSettings settings)
+        {
+            LastStatusMessage = "Design-time settings saved.";
+        }
+
+        public AppSettings ResetToDefaults()
+        {
+            LastStatusMessage = "Design-time settings reset.";
+            return AppSettings.CreateDefault();
+        }
     }
 
     private sealed class DesignTimePlatformInfoService : IPlatformInfoService
