@@ -40,7 +40,7 @@ dotnet test .\NordControl.sln
 
 ## Current Status
 
-Stage 1 is in progress. The repository contains a working Avalonia app shell with dark styling, sidebar navigation, Dashboard window counts, a Window Manager page, native topmost pin/unpin support, persistent JSON settings under AppData, a Customization Studio foundation, initial Core abstractions, a Windows service layer, and basic tests.
+Stage 1 is in progress. The repository contains a working Avalonia app shell with dark styling, sidebar navigation, Dashboard window counts, a Window Manager page, native topmost pin/unpin support, persistent JSON settings under AppData, a subsection-based Customization Studio foundation, initial Core abstractions, a Windows service layer, and basic tests.
 
 ## Planned Modules
 

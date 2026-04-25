@@ -16,6 +16,8 @@ Settings follow the same dependency direction. `NordControl.Core` defines `AppSe
 
 Customization follows the platform boundary as well. `NordControl.Core` defines personalization state, operation results, preset models, and `IWindowsPersonalizationService`; `NordControl.Windows` owns current-user Windows personalization reads and low-risk writes; `NordControl.App` owns the Customization Studio UI, preview state, and preset gallery.
 
+Customization roadmap sections are catalog-driven. `NordControl.Core` defines section and feature-card data for Overview, Themes, Taskbar, Start Menu, Desktop Widgets, Window Effects, Launcher, Layouts / Tiling, and Advanced / Risk Lab; `NordControl.App` renders those sections and stores the selected subsection in settings.
+
 `NordControl.Tests` contains tests for non-UI logic. Core behavior should be tested here first. Windows services can also be tested when they expose deterministic behavior or safe environment reads.
 
 ## Dependency Direction

@@ -51,6 +51,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         CustomizationPresets = CustomizationPresetCatalog.DefaultPresets
             .Select(preset => new CustomizationPresetViewModel(preset, ApplyCustomizationPreset))
             .ToList();
+        CustomizationSections = CustomizationSectionCatalog.Sections
+            .Select(section => new CustomizationSectionViewModel(section, SelectCustomizationSection))
+            .ToList();
 
         PlatformInfo = this.platformInfoService.GetPlatformInfo();
         SettingsFilePath = this.appSettingsService.SettingsFilePath;
@@ -79,6 +82,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public ObservableCollection<WindowRowViewModel> FilteredWindows { get; } = [];
 
     public IReadOnlyList<CustomizationPresetViewModel> CustomizationPresets { get; }
+
+    public IReadOnlyList<CustomizationSectionViewModel> CustomizationSections { get; }
+
+    public ObservableCollection<CustomizationFeatureCardViewModel> CurrentCustomizationFeatureCards { get; } = [];
 
     public string SettingsFilePath { get; }
 
@@ -147,6 +154,16 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private string selectedCustomizationPresetKey = "fluent-dark";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentCustomizationSectionName))]
+    [NotifyPropertyChangedFor(nameof(CurrentCustomizationSectionDescription))]
+    [NotifyPropertyChangedFor(nameof(CurrentCustomizationSectionBadge))]
+    [NotifyPropertyChangedFor(nameof(IsCustomizationOverviewSection))]
+    [NotifyPropertyChangedFor(nameof(IsCustomizationThemesSection))]
+    [NotifyPropertyChangedFor(nameof(IsCustomizationPlanningSection))]
+    [NotifyPropertyChangedFor(nameof(IsCustomizationRiskLabSection))]
+    private CustomizationSectionViewModel? selectedCustomizationSection;
+
+    [ObservableProperty]
     private string nordControlAccentColorHex = "#4CC2FF";
 
     [ObservableProperty]
@@ -209,6 +226,22 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public string PersonalizationLastLoadedText =>
         PersonalizationLastLoadedAt?.ToString("HH:mm:ss") ?? "Not loaded";
 
+    public string CurrentCustomizationSectionName => SelectedCustomizationSection?.Name ?? "Overview";
+
+    public string CurrentCustomizationSectionDescription =>
+        SelectedCustomizationSection?.Description ?? "Snapshot, safety status, and the desktop environment roadmap.";
+
+    public string CurrentCustomizationSectionBadge => SelectedCustomizationSection?.Badge ?? "Safe Layer";
+
+    public bool IsCustomizationOverviewSection => SelectedCustomizationSection?.Key == "overview";
+
+    public bool IsCustomizationThemesSection => SelectedCustomizationSection?.Key == "themes";
+
+    public bool IsCustomizationRiskLabSection => SelectedCustomizationSection?.IsRiskLab == true;
+
+    public bool IsCustomizationPlanningSection =>
+        !IsCustomizationOverviewSection && !IsCustomizationThemesSection;
+
     partial void OnSelectedModuleChanged(ShellModuleViewModel? value)
     {
         if (!isApplyingSettings && value is not null)
@@ -220,6 +253,22 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     partial void OnSearchTextChanged(string value)
     {
         ApplyWindowFilter();
+    }
+
+    partial void OnSelectedCustomizationSectionChanged(CustomizationSectionViewModel? value)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        currentSettings.Customization.LastSelectedSectionKey = value.Key;
+        if (!isApplyingSettings)
+        {
+            appSettingsService.Save(currentSettings);
+        }
+
+        RefreshCustomizationFeatureCards();
     }
 
     [RelayCommand]
@@ -424,6 +473,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         ConfirmBeforePinning = currentSettings.WindowManager.ConfirmBeforePinning;
         ShowUnknownProcesses = currentSettings.WindowManager.ShowUnknownProcesses;
         SelectedCustomizationPresetKey = currentSettings.Customization.SelectedPresetKey;
+        SelectedCustomizationSection = CustomizationSections
+            .FirstOrDefault(section => section.Key == currentSettings.Customization.LastSelectedSectionKey)
+            ?? CustomizationSections.FirstOrDefault(section => section.Key == CustomizationSectionCatalog.DefaultSectionKey)
+            ?? CustomizationSections.FirstOrDefault();
         NordControlAccentColorHex = currentSettings.Customization.NordControlAccentColorHex;
         EnableGlassStyleInApp = currentSettings.Customization.EnableGlassStyleInApp;
         AllowLowRiskWindowsPersonalization = currentSettings.Customization.AllowLowRiskWindowsPersonalization;
@@ -446,12 +499,17 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         currentSettings.WindowManager.ConfirmBeforePinning = ConfirmBeforePinning;
         currentSettings.WindowManager.ShowUnknownProcesses = ShowUnknownProcesses;
         currentSettings.Customization.SelectedPresetKey = SelectedCustomizationPresetKey;
+        currentSettings.Customization.LastSelectedSectionKey =
+            SelectedCustomizationSection?.Key ?? CustomizationSectionCatalog.DefaultSectionKey;
         currentSettings.Customization.NordControlAccentColorHex = NordControlAccentColorHex;
         currentSettings.Customization.EnableGlassStyleInApp = EnableGlassStyleInApp;
         currentSettings.Customization.AllowLowRiskWindowsPersonalization = AllowLowRiskWindowsPersonalization;
         currentSettings.Normalize();
         AutoRefreshIntervalSeconds = currentSettings.WindowManager.AutoRefreshIntervalSeconds;
         SelectedCustomizationPresetKey = currentSettings.Customization.SelectedPresetKey;
+        SelectedCustomizationSection = CustomizationSections
+            .FirstOrDefault(section => section.Key == currentSettings.Customization.LastSelectedSectionKey)
+            ?? SelectedCustomizationSection;
         NordControlAccentColorHex = currentSettings.Customization.NordControlAccentColorHex;
     }
 
@@ -509,6 +567,22 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         currentSettings.Customization.EnableGlassStyleInApp = true;
         appSettingsService.Save(currentSettings);
         PersonalizationStatusMessage = $"{preset.Name} applied to NordControl preview and saved.";
+    }
+
+    private void SelectCustomizationSection(CustomizationSectionViewModel section)
+    {
+        SelectedCustomizationSection = section;
+    }
+
+    private void RefreshCustomizationFeatureCards()
+    {
+        CurrentCustomizationFeatureCards.Clear();
+
+        var sectionKey = SelectedCustomizationSection?.Key ?? CustomizationSectionCatalog.DefaultSectionKey;
+        foreach (var card in CustomizationSectionCatalog.GetFeatureCards(sectionKey))
+        {
+            CurrentCustomizationFeatureCards.Add(new CustomizationFeatureCardViewModel(card));
+        }
     }
 
     private void StartOrUpdateAutoRefreshTimer()

@@ -16,6 +16,7 @@ public sealed class AppSettingsTests
         Assert.Equal(0, settings.WindowManager.AutoRefreshIntervalSeconds);
         Assert.False(settings.WindowManager.ConfirmBeforePinning);
         Assert.True(settings.WindowManager.ShowUnknownProcesses);
+        Assert.Equal("overview", settings.Customization.LastSelectedSectionKey);
         Assert.Equal("fluent-dark", settings.Customization.SelectedPresetKey);
         Assert.Equal("#4CC2FF", settings.Customization.NordControlAccentColorHex);
         Assert.True(settings.Customization.EnableGlassStyleInApp);
@@ -27,11 +28,13 @@ public sealed class AppSettingsTests
     {
         var settings = AppSettings.CreateDefault();
         settings.WindowManager.AutoRefreshIntervalSeconds = -10;
+        settings.Customization.LastSelectedSectionKey = "not-a-section";
         settings.Customization.NordControlAccentColorHex = "blue-ish";
 
         settings.Normalize();
 
         Assert.Equal(0, settings.WindowManager.AutoRefreshIntervalSeconds);
+        Assert.Equal("overview", settings.Customization.LastSelectedSectionKey);
         Assert.Equal("#4CC2FF", settings.Customization.NordControlAccentColorHex);
     }
 
