@@ -1,0 +1,199 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:NordControl.App.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DesignWidth="1120"
+        d:DesignHeight="720"
+        x:Class="NordControl.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="NordControl"
+        Width="1120"
+        Height="720"
+        MinWidth="900"
+        MinHeight="560"
+        Background="#101418">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Inter"/>
+        </Style>
+        <Style Selector="ListBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Margin" Value="0,3"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="260,*">
+        <Border Grid.Column="0"
+                Background="#151A20"
+                BorderBrush="#26313D"
+                BorderThickness="0,0,1,0"
+                Padding="18">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="NordControl"
+                               Foreground="#F4F7FA"
+                               FontSize="24"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="Personal Windows control center"
+                               Foreground="#8FA1B3"
+                               FontSize="12"/>
+                </StackPanel>
+
+                <ListBox Grid.Row="1"
+                         Margin="0,28,0,0"
+                         ItemsSource="{Binding Modules}"
+                         SelectedItem="{Binding SelectedModule}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ShellModuleViewModel">
+                            <Border Padding="12,10"
+                                    CornerRadius="8"
+                                    Background="#1D252E">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="{Binding DisplayName}"
+                                               Foreground="#F4F7FA"
+                                               FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding Status}"
+                                               Foreground="#8FA1B3"
+                                               FontSize="11"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Border Grid.Row="2"
+                        Background="#1D252E"
+                        CornerRadius="8"
+                        Padding="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Platform"
+                                   Foreground="#8FA1B3"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding PlatformSummary}"
+                                   Foreground="#D8E1EA"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Column="1">
+            <StackPanel Margin="34,30,34,34" Spacing="22">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding ActiveModuleName}"
+                                   Foreground="#F4F7FA"
+                                   FontSize="30"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding ActiveModuleDescription}"
+                                   Foreground="#9AAABD"
+                                   FontSize="14"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="680"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="1"
+                            VerticalAlignment="Top"
+                            Background="#223040"
+                            BorderBrush="#34506A"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12,7">
+                        <TextBlock Text="{Binding ActiveModuleStatus}"
+                                   Foreground="#B7D7F2"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+                    </Border>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto"
+                      ColumnSpacing="16"
+                      RowSpacing="16">
+                    <Border Background="#161D24"
+                            BorderBrush="#273442"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="18">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Module Workspace"
+                                       Foreground="#F4F7FA"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="This area is ready for the selected module's controls, status panels, and workflows."
+                                       Foreground="#9AAABD"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Background="#161D24"
+                            BorderBrush="#273442"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="18">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Safety First"
+                                       Foreground="#F4F7FA"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="System-level features will live behind explicit services, logging, and future rollback paths."
+                                       Foreground="#9AAABD"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1"
+                            Grid.ColumnSpan="2"
+                            Background="#161D24"
+                            BorderBrush="#273442"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="18">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Prepared Modules"
+                                       Foreground="#F4F7FA"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"/>
+                            <ItemsControl ItemsSource="{Binding Modules}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ShellModuleViewModel">
+                                        <Grid ColumnDefinitions="180,*,120"
+                                              Margin="0,6">
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       Foreground="#D8E1EA"
+                                                       FontWeight="SemiBold"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Description}"
+                                                       Foreground="#9AAABD"
+                                                       TextWrapping="Wrap"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding Status}"
+                                                       Foreground="#B7D7F2"
+                                                       HorizontalAlignment="Right"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
