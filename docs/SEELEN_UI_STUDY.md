@@ -55,7 +55,7 @@ NordControl should implement similar categories of ideas independently in C# and
 
 ## NordControl Theme Package Notes
 
-NordControl theme packages are an independent C# model for app and future overlay visuals. They describe colors, glass behavior, corner radius, mood, and tags, and can be exported as NordControl JSON files. They are conceptual equivalents only; do not copy Seelen UI package formats, assets, code, naming, or branding.
+NordControl theme packages are an independent C# model for app and future overlay visuals. They describe colors, glass behavior, corner radius, mood, and tags, and can be imported/exported as NordControl JSON files or created in the Customization editor. They are conceptual equivalents only; do not copy Seelen UI package formats, assets, code, naming, or branding.
 
 ## Risks And Technical Challenges
 

@@ -10,17 +10,21 @@ public sealed partial class ThemePackageViewModel : ObservableObject
 {
     public ThemePackageViewModel(
         ThemePackage theme,
+        string source,
         Action<ThemePackageViewModel> previewTheme,
         Action<ThemePackageViewModel> applyTheme,
         Action<ThemePackageViewModel> exportTheme)
     {
         Theme = theme;
+        Source = source;
         PreviewCommand = new RelayCommand(() => previewTheme(this));
         ApplyCommand = new RelayCommand(() => applyTheme(this));
         ExportCommand = new RelayCommand(() => exportTheme(this));
     }
 
     public ThemePackage Theme { get; }
+
+    public string Source { get; }
 
     public string Key => Theme.Key;
 

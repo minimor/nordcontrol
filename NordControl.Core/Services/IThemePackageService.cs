@@ -4,13 +4,21 @@ namespace NordControl.Core.Services;
 
 public interface IThemePackageService
 {
-    IReadOnlyList<ThemePackage> GetBuiltInThemes();
+    string UserThemesDirectory { get; }
 
-    ThemePackage GetSelectedTheme(AppSettings settings);
+    IReadOnlyList<ThemePackage> GetBuiltInPackages();
 
-    ThemePackageOperationResult ExportTheme(ThemePackage theme, string filePath);
+    IReadOnlyList<ThemePackage> GetUserPackages();
 
-    ThemePackageOperationResult ImportTheme(string filePath, out ThemePackage? theme);
+    IReadOnlyList<ThemePackage> GetAllPackages();
+
+    ThemePackage GetSelectedPackage(AppSettings settings);
+
+    ThemePackageOperationResult ExportPackage(ThemePackage theme, string filePath);
+
+    ThemePackageOperationResult ImportPackage(string filePath);
+
+    ThemePackageOperationResult SaveUserPackage(ThemePackage theme);
 
     ThemePackage Normalize(ThemePackage theme);
 }

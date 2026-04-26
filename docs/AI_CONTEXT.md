@@ -36,7 +36,7 @@ The app currently includes:
 - Persistent app settings.
 - Settings page.
 - Customization Studio.
-- Theme Package system with built-in packages and JSON export.
+- Theme Package system with built-in packages, user/imported packages, JSON import/export, custom editing, and live preview.
 - Customization internal sections:
   - Overview
   - Themes
@@ -49,7 +49,7 @@ The app currently includes:
   - Advanced / Risk Lab
 - Windows personalization safe controls for current-user apps/system theme, transparency, and title-bar accent.
 - Preset gallery and desktop environment roadmap cards.
-- Theme package gallery in the Customization Themes subsection.
+- Theme package gallery, import/export controls, custom theme editor, and live preview in the Customization Themes subsection.
 
 ## Existing Modules
 
@@ -104,6 +104,7 @@ Current settings include:
 - Customization selected preset
 - Customization selected theme package
 - Last exported theme package path
+- Last imported theme package path
 - Whether theme packages should update the NordControl shell preview
 - Customization selected subsection
 - NordControl accent color
@@ -116,7 +117,7 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 
 - `MainWindowViewModel` and `MainWindow.axaml` now act as shell/navigation host; module behavior lives in page-specific view models and views.
 - Customization taskbar, Start menu, widget, launcher, layout, and Risk Lab sections are planning UI only.
-- Imported theme package UI is not implemented yet; JSON export is available from built-in package cards.
+- Theme package import uses a path textbox rather than a native file picker.
 - System accent color and wallpaper changes are not implemented.
 - No global hotkeys yet.
 - No autopin rules yet.
@@ -127,8 +128,8 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 
 ## Next Priorities
 
-1. Add theme package import UI and custom theme editing.
-2. Improve app-level theme preview and visual state.
+1. Improve app-level dynamic styling beyond the Customization live preview.
+2. Add native file picker support for theme import/export.
 3. Research safe taskbar customization without Explorer patching.
 4. Add Desktop Widgets overlay architecture.
 5. Add Command Launcher and hotkey support.

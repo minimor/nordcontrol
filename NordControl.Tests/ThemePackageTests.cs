@@ -83,20 +83,29 @@ public sealed class ThemePackageTests
         var tempDirectory = CreateTempDirectory();
         try
         {
-            var service = new JsonThemePackageService();
-            var filePath = Path.Combine(tempDirectory, "themes", "aurora.json");
-            var theme = ThemePackageCatalog.GetThemeOrDefault("aurora");
+            var userThemesDirectory = Path.Combine(tempDirectory, "user-themes");
+            var service = new JsonThemePackageService(userThemesDirectory);
+            var filePath = Path.Combine(tempDirectory, "export", "round-trip.json");
+            var theme = new ThemePackage
+            {
+                Key = "round-trip",
+                Name = "Round Trip",
+                AccentColorHex = "#12ABEF",
+                BackgroundColorHex = "#101418",
+                SurfaceColorHex = "#161D24",
+                TextColorHex = "#F4F7FA"
+            };
 
-            var exportResult = service.ExportTheme(theme, filePath);
-            var importResult = service.ImportTheme(filePath, out var importedTheme);
+            var exportResult = service.ExportPackage(theme, filePath);
+            var importResult = service.ImportPackage(filePath);
+            var importedTheme = service.GetUserPackages().Single();
 
             Assert.True(exportResult.Success);
             Assert.True(File.Exists(filePath));
             Assert.True(importResult.Success);
-            Assert.NotNull(importedTheme);
             Assert.Equal(theme.Key, importedTheme.Key);
-            Assert.Equal(theme.AccentColorHex, importedTheme.AccentColorHex);
-            Assert.Equal(theme.Tags, importedTheme.Tags);
+            Assert.Equal("#12ABEF", importedTheme.AccentColorHex);
+            Assert.Contains(service.GetAllPackages(), package => package.Key == importedTheme.Key);
         }
         finally
         {
@@ -113,12 +122,63 @@ public sealed class ThemePackageTests
             var filePath = Path.Combine(tempDirectory, "broken.json");
             File.WriteAllText(filePath, "{not valid json");
 
-            var service = new JsonThemePackageService();
-            var result = service.ImportTheme(filePath, out var theme);
+            var service = new JsonThemePackageService(Path.Combine(tempDirectory, "themes"));
+            var result = service.ImportPackage(filePath);
 
             Assert.False(result.Success);
-            Assert.Null(theme);
             Assert.Contains("invalid", result.Message, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            Directory.Delete(tempDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ServicePersistsUserPackagesAcrossInstances()
+    {
+        var tempDirectory = CreateTempDirectory();
+        try
+        {
+            var service = new JsonThemePackageService(tempDirectory);
+            var theme = new ThemePackage
+            {
+                Key = "saved-theme",
+                Name = "Saved Theme",
+                AccentColorHex = "#AABBCC"
+            };
+
+            var saveResult = service.SaveUserPackage(theme);
+            var reloadedService = new JsonThemePackageService(tempDirectory);
+            var userThemes = reloadedService.GetUserPackages();
+
+            Assert.True(saveResult.Success);
+            Assert.Single(userThemes);
+            Assert.Equal("saved-theme", userThemes[0].Key);
+            Assert.Equal("Saved Theme", userThemes[0].Name);
+        }
+        finally
+        {
+            Directory.Delete(tempDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ImportDoesNotOverwriteBuiltInPackageKeys()
+    {
+        var tempDirectory = CreateTempDirectory();
+        try
+        {
+            var importFilePath = Path.Combine(tempDirectory, "fluent-dark.json");
+            var service = new JsonThemePackageService(Path.Combine(tempDirectory, "themes"));
+            var exportResult = service.ExportPackage(ThemePackageCatalog.DefaultTheme, importFilePath);
+            var importResult = service.ImportPackage(importFilePath);
+            var userTheme = service.GetUserPackages().Single();
+
+            Assert.True(exportResult.Success);
+            Assert.True(importResult.Success);
+            Assert.Equal("user-fluent-dark", userTheme.Key);
+            Assert.Contains(ThemePackageCatalog.DefaultTheme, service.GetBuiltInPackages());
         }
         finally
         {

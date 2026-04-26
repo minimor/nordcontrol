@@ -127,6 +127,17 @@
                 </Grid>
                 <Grid ColumnDefinitions="220,*"
                       ColumnSpacing="12">
+                    <TextBlock Text="Last imported theme"
+                               Foreground="#D8E1EA"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding LastImportedThemePath}"
+                               Foreground="#B7D7F2"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"/>
+                </Grid>
+                <Grid ColumnDefinitions="220,*"
+                      ColumnSpacing="12">
                     <TextBlock Text="Customization section"
                                Foreground="#D8E1EA"
                                VerticalAlignment="Center"/>

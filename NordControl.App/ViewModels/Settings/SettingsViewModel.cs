@@ -61,6 +61,9 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
     private string lastExportedThemePath = string.Empty;
 
     [ObservableProperty]
+    private string lastImportedThemePath = string.Empty;
+
+    [ObservableProperty]
     private bool applyThemeToNordControlShell = true;
 
     [ObservableProperty]
@@ -121,6 +124,9 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
         LastExportedThemePath = string.IsNullOrWhiteSpace(settings.Customization.LastExportedThemePath)
             ? "No theme exported yet."
             : settings.Customization.LastExportedThemePath;
+        LastImportedThemePath = string.IsNullOrWhiteSpace(settings.Customization.LastImportedThemePath)
+            ? "No theme imported yet."
+            : settings.Customization.LastImportedThemePath;
         ApplyThemeToNordControlShell = settings.Customization.ApplyThemeToNordControlShell;
         CurrentCustomizationSectionName = customizationViewModel.CurrentCustomizationSectionName;
         NordControlAccentColorHex = settings.Customization.NordControlAccentColorHex;

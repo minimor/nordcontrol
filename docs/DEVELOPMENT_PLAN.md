@@ -40,7 +40,7 @@ Branch/commit note: Commit to `dev` unless asked otherwise.
 
 Goal: Turn Customization Studio into a real theme/configuration system.
 
-Status: In progress. The Theme Package model, built-in catalog, JSON export service, settings persistence, and Customization Themes package gallery are implemented.
+Status: In progress. Theme packages now support built-in and user packages, JSON import/export, persistent AppData theme storage, a custom theme editor, settings persistence, and a live app preview in Customization.
 
 Deliverables:
 

@@ -284,7 +284,12 @@
                 </Border>
             </Grid>
 
-            <ItemsControl ItemsSource="{Binding ThemePackages}">
+            <TextBlock Text="Built-in packages"
+                       Foreground="#F4F7FA"
+                       FontSize="16"
+                       FontWeight="SemiBold"/>
+
+            <ItemsControl ItemsSource="{Binding BuiltInThemePackages}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel/>
@@ -364,6 +369,138 @@
                                                            FontSize="12"
                                                            FontWeight="SemiBold"/>
                                             </Border>
+                                            <Border Background="#18202A"
+                                                    BorderBrush="{Binding BorderColorHex}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="9,5">
+                                                <TextBlock Text="{Binding Source}"
+                                                           Foreground="#B7D7F2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                            <Border Background="{Binding SecondaryAccentColorHex}"
+                                                    CornerRadius="8"
+                                                    Padding="9,5"
+                                                    IsVisible="{Binding IsSelected}">
+                                                <TextBlock Text="Selected"
+                                                           Foreground="#101418"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="*,*,*"
+                                          ColumnSpacing="8">
+                                        <Button Content="Preview"
+                                                Command="{Binding PreviewCommand}"/>
+                                        <Button Grid.Column="1"
+                                                Content="Apply"
+                                                Command="{Binding ApplyCommand}"/>
+                                        <Button Grid.Column="2"
+                                                Content="Export JSON"
+                                                Command="{Binding ExportCommand}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Text="User / imported packages"
+                       Foreground="#F4F7FA"
+                       FontSize="16"
+                       FontWeight="SemiBold"/>
+
+            <Border Background="#111821"
+                    BorderBrush="#2B3B4B"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16"
+                    IsVisible="{Binding ShowNoUserThemePackages}">
+                <TextBlock Text="No user themes yet. Import a JSON package or save a custom theme."
+                           Foreground="#AFC2D3"
+                           TextWrapping="Wrap"/>
+            </Border>
+
+            <ItemsControl ItemsSource="{Binding UserThemePackages}"
+                          IsVisible="{Binding HasUserThemePackages}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ThemePackageViewModel">
+                        <Border Width="304"
+                                MinHeight="244"
+                                Margin="0,0,14,14"
+                                Background="{Binding SurfaceColorHex}"
+                                BorderBrush="{Binding BorderColorHex}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="0">
+                            <Grid RowDefinitions="10,*">
+                                <Grid ColumnDefinitions="*,*,*,*,*">
+                                    <Border Background="{Binding BackgroundColorHex}"/>
+                                    <Border Grid.Column="1"
+                                            Background="{Binding SurfaceColorHex}"/>
+                                    <Border Grid.Column="2"
+                                            Background="{Binding AccentColorHex}"/>
+                                    <Border Grid.Column="3"
+                                            Background="{Binding SecondaryAccentColorHex}"/>
+                                    <Border Grid.Column="4"
+                                            Background="{Binding BorderColorHex}"/>
+                                </Grid>
+
+                                <StackPanel Grid.Row="1"
+                                            Spacing="12"
+                                            Margin="16">
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          ColumnSpacing="10">
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="{Binding Name}"
+                                                       Foreground="{Binding TextColorHex}"
+                                                       FontSize="18"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Mood}"
+                                                       Foreground="{Binding SecondaryAccentColorHex}"
+                                                       FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <Border Grid.Column="1"
+                                                Background="{Binding AccentColorHex}"
+                                                Width="36"
+                                                Height="36"
+                                                CornerRadius="8"/>
+                                    </Grid>
+
+                                    <TextBlock Text="{Binding Description}"
+                                               Foreground="{Binding MutedTextColorHex}"
+                                               TextWrapping="Wrap"
+                                               MinHeight="48"/>
+
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          ColumnSpacing="8">
+                                        <TextBlock Text="{Binding TagsText}"
+                                                   Foreground="{Binding TextColorHex}"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap"/>
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    Spacing="6">
+                                            <Border Background="#18202A"
+                                                    BorderBrush="{Binding BorderColorHex}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="9,5">
+                                                <TextBlock Text="{Binding Source}"
+                                                           Foreground="#B7D7F2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
                                             <Border Background="{Binding SecondaryAccentColorHex}"
                                                     CornerRadius="8"
                                                     Padding="9,5"
@@ -394,6 +531,220 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
+
+        <Grid ColumnDefinitions="*,*"
+              ColumnSpacing="16"
+              IsVisible="{Binding IsCustomizationThemesSection}">
+            <Border Background="#161D24"
+                    BorderBrush="#2C3C4E"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="18">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Import / Export"
+                               Foreground="#F4F7FA"
+                               FontSize="20"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="Theme JSON files are stored in the user theme folder and reloaded on startup."
+                               Foreground="#AFC2D3"
+                               TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding ThemesDirectoryPath}"
+                               Foreground="#B7D7F2"
+                               TextWrapping="Wrap"/>
+                    <TextBox PlaceholderText="Paste a theme JSON path"
+                             Text="{Binding ImportThemeFilePath, Mode=TwoWay}"
+                             MinHeight="34"/>
+                    <Grid ColumnDefinitions="Auto,Auto,*"
+                          ColumnSpacing="10">
+                        <Button Content="Import Theme JSON"
+                                Command="{Binding ImportThemePackageCommand}"/>
+                        <Button Grid.Column="1"
+                                Content="Export Selected"
+                                Command="{Binding ExportSelectedThemePackageCommand}"/>
+                    </Grid>
+                    <TextBlock Text="{Binding ThemeOperationStatus}"
+                               Foreground="#8CF5D2"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Background="{Binding PreviewBackgroundColorHex}"
+                    BorderBrush="{Binding PreviewBorderColorHex}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="18">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Live Preview"
+                                       Foreground="{Binding PreviewTextColorHex}"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding PreviewThemeName}"
+                                       Foreground="{Binding PreviewMutedTextColorHex}"/>
+                        </StackPanel>
+                        <Border Grid.Column="1"
+                                Background="{Binding PreviewAccentColorHex}"
+                                Width="42"
+                                Height="42"
+                                CornerRadius="8"/>
+                    </Grid>
+
+                    <Border Background="{Binding PreviewSurfaceColorHex}"
+                            BorderBrush="{Binding PreviewBorderColorHex}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12">
+                        <Grid ColumnDefinitions="76,*"
+                              ColumnSpacing="12">
+                            <StackPanel Spacing="8">
+                                <Border Height="10"
+                                        Background="{Binding PreviewAccentColorHex}"
+                                        CornerRadius="5"/>
+                                <Border Height="10"
+                                        Background="{Binding PreviewMutedTextColorHex}"
+                                        CornerRadius="5"/>
+                                <Border Height="10"
+                                        Background="{Binding PreviewMutedTextColorHex}"
+                                        CornerRadius="5"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1"
+                                        Spacing="8">
+                                <TextBlock Text="NordControl shell"
+                                           Foreground="{Binding PreviewTextColorHex}"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="Cards, widgets, launcher, and taskbar previews can share this package later."
+                                           Foreground="{Binding PreviewMutedTextColorHex}"
+                                           TextWrapping="Wrap"/>
+                                <Border Background="{Binding PreviewAccentColorHex}"
+                                        CornerRadius="8"
+                                        Padding="12,7"
+                                        HorizontalAlignment="Left">
+                                    <TextBlock Text="Accent action"
+                                               Foreground="#101418"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <TextBlock Text="{Binding PreviewGlassText}"
+                               Foreground="{Binding PreviewSecondaryAccentColorHex}"
+                               FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Background="#161D24"
+                BorderBrush="#2C3C4E"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="18"
+                IsVisible="{Binding IsCustomizationThemesSection}">
+            <StackPanel Spacing="14">
+                <TextBlock Text="Custom Theme Editor"
+                           Foreground="#F4F7FA"
+                           FontSize="20"
+                           FontWeight="SemiBold"/>
+                <Grid ColumnDefinitions="*,*"
+                      ColumnSpacing="14"
+                      RowDefinitions="Auto,Auto,Auto,Auto"
+                      RowSpacing="12">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Theme name"
+                                   Foreground="#D8E1EA"/>
+                        <TextBox Text="{Binding CustomThemeName, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="6">
+                        <TextBlock Text="Mood / style"
+                                   Foreground="#D8E1EA"/>
+                        <TextBox Text="{Binding CustomMood, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1"
+                                Grid.ColumnSpan="2"
+                                Spacing="6">
+                        <TextBlock Text="Description"
+                                   Foreground="#D8E1EA"/>
+                        <TextBox Text="{Binding CustomThemeDescription, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2"
+                                Spacing="6">
+                        <TextBlock Text="Accent color"
+                                   Foreground="#D8E1EA"/>
+                        <Grid ColumnDefinitions="*,40"
+                              ColumnSpacing="8">
+                            <TextBox Text="{Binding CustomAccentColorHex, Mode=TwoWay}"/>
+                            <Border Grid.Column="1"
+                                    Background="{Binding CustomAccentColorHex}"
+                                    BorderBrush="#304459"
+                                    BorderThickness="1"
+                                    CornerRadius="8"/>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2"
+                                Grid.Column="1"
+                                Spacing="6">
+                        <TextBlock Text="Background color"
+                                   Foreground="#D8E1EA"/>
+                        <Grid ColumnDefinitions="*,40"
+                              ColumnSpacing="8">
+                            <TextBox Text="{Binding CustomBackgroundColorHex, Mode=TwoWay}"/>
+                            <Border Grid.Column="1"
+                                    Background="{Binding CustomBackgroundColorHex}"
+                                    BorderBrush="#304459"
+                                    BorderThickness="1"
+                                    CornerRadius="8"/>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Row="3"
+                                Spacing="6">
+                        <TextBlock Text="Surface color"
+                                   Foreground="#D8E1EA"/>
+                        <Grid ColumnDefinitions="*,40"
+                              ColumnSpacing="8">
+                            <TextBox Text="{Binding CustomSurfaceColorHex, Mode=TwoWay}"/>
+                            <Border Grid.Column="1"
+                                    Background="{Binding CustomSurfaceColorHex}"
+                                    BorderBrush="#304459"
+                                    BorderThickness="1"
+                                    CornerRadius="8"/>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Row="3"
+                                Grid.Column="1"
+                                Spacing="6">
+                        <TextBlock Text="Text color"
+                                   Foreground="#D8E1EA"/>
+                        <Grid ColumnDefinitions="*,40"
+                              ColumnSpacing="8">
+                            <TextBox Text="{Binding CustomTextColorHex, Mode=TwoWay}"/>
+                            <Border Grid.Column="1"
+                                    Background="{Binding CustomTextColorHex}"
+                                    BorderBrush="#304459"
+                                    BorderThickness="1"
+                                    CornerRadius="8"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+                <CheckBox Content="Enable glass style"
+                          IsChecked="{Binding CustomEnableGlass, Mode=TwoWay}"/>
+                <Grid ColumnDefinitions="Auto,Auto,Auto,*"
+                      ColumnSpacing="10">
+                    <Button Content="Preview Custom Theme"
+                            Command="{Binding PreviewCustomThemeCommand}"/>
+                    <Button Grid.Column="1"
+                            Content="Save Custom Theme"
+                            Command="{Binding SaveCustomThemeCommand}"/>
+                    <Button Grid.Column="2"
+                            Content="Reset Editor"
+                            Command="{Binding ResetCustomThemeEditorCommand}"/>
+                </Grid>
+                <TextBlock Text="{Binding CustomThemeValidationMessage}"
+                           Foreground="#FFD166"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
 
         <StackPanel Spacing="12"
                     IsVisible="{Binding IsCustomizationThemesSection}">
