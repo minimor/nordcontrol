@@ -3,28 +3,40 @@
              xmlns:vm="using:NordControl.App.ViewModels.Widgets"
              x:Class="NordControl.App.Views.Widgets.SystemMonitorLiteWidgetView"
              x:DataType="vm:DesktopWidgetWindowViewModel">
-    <StackPanel Spacing="10">
+    <StackPanel Spacing="12">
         <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="System Monitor Lite"
-                       Foreground="#8FA1B3"
-                       FontSize="12"
+            <TextBlock Text="Live system snapshot"
+                       Foreground="{Binding AccentColorHex}"
+                       FontSize="13"
                        FontWeight="SemiBold"/>
             <Border Grid.Column="1"
                     Background="{Binding AccentColorHex}"
-                    Width="26"
+                    Width="34"
                     Height="8"
-                    CornerRadius="4"/>
+                    CornerRadius="4"
+                    VerticalAlignment="Center"/>
         </Grid>
         <TextBlock Text="{Binding CpuText}"
                    Foreground="#F4F7FA"
-                   FontSize="20"
+                   FontSize="22"
                    FontWeight="SemiBold"/>
-        <TextBlock Text="{Binding MemoryText}"
-                   Foreground="#D8E1EA"
-                   FontSize="17"
-                   FontWeight="SemiBold"/>
-        <TextBlock Text="{Binding MonitorNote}"
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="{Binding MemoryText}"
+                       Foreground="#D8E1EA"
+                       FontSize="17"
+                       FontWeight="SemiBold"/>
+            <TextBlock Grid.Column="1"
+                       Text="{Binding LockStatusText}"
+                       Foreground="#8FA1B3"
+                       FontSize="11"/>
+        </Grid>
+        <TextBlock Text="{Binding MemoryDetailText}"
                    Foreground="#AFC2D3"
+                   FontSize="12"
+                   TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding MonitorNote}"
+                   Foreground="#8FA1B3"
+                   FontSize="12"
                    TextWrapping="Wrap"/>
     </StackPanel>
 </UserControl>

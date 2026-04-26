@@ -151,6 +151,12 @@ internal sealed class DesignTimeDesktopWidgetService : IDesktopWidgetService
 {
     private DesktopWidgetSettings settings = new();
 
+    public bool IsWidgetsVisible { get; private set; }
+
+    public int ActiveWidgetCount => IsWidgetsVisible
+        ? settings.Widgets.Count(widget => widget.IsEnabled && NordControl.Core.Modules.DesktopWidgetCatalog.IsImplementedWidgetType(widget.WidgetType))
+        : 0;
+
     public IReadOnlyList<DesktopWidgetDefinition> GetDefinitions()
     {
         return NordControl.Core.Modules.DesktopWidgetCatalog.Definitions;
@@ -171,11 +177,13 @@ internal sealed class DesignTimeDesktopWidgetService : IDesktopWidgetService
 
     public WidgetOperationResult ShowWidgets()
     {
+        IsWidgetsVisible = true;
         return WidgetOperationResult.Succeeded("Design-time widget windows shown.");
     }
 
     public WidgetOperationResult HideWidgets()
     {
+        IsWidgetsVisible = false;
         return WidgetOperationResult.Succeeded("Design-time widget windows hidden.");
     }
 
@@ -188,5 +196,40 @@ internal sealed class DesignTimeDesktopWidgetService : IDesktopWidgetService
     {
         settings.Widgets = NordControl.Core.Modules.DesktopWidgetCatalog.CreateDefaultWidgetInstances();
         return WidgetOperationResult.Succeeded("Design-time widget layout reset.");
+    }
+
+    public WidgetOperationResult SaveWidgetBounds(string widgetId, double x, double y, double width, double height)
+    {
+        var widget = settings.Widgets.FirstOrDefault(item => item.Id == widgetId);
+        if (widget is null)
+        {
+            return WidgetOperationResult.Failed("Design-time widget was not found.");
+        }
+
+        widget.X = x;
+        widget.Y = y;
+        widget.Width = width;
+        widget.Height = height;
+        widget.Normalize();
+        return WidgetOperationResult.Succeeded("Design-time widget bounds saved.");
+    }
+
+    public WidgetOperationResult HideWidget(string widgetId, bool disable)
+    {
+        if (disable)
+        {
+            var widget = settings.Widgets.FirstOrDefault(item => item.Id == widgetId);
+            if (widget is not null)
+            {
+                widget.IsEnabled = false;
+            }
+        }
+
+        return WidgetOperationResult.Succeeded("Design-time widget hidden.");
+    }
+
+    public string GetWidgetLayoutSummary()
+    {
+        return string.Join(", ", settings.Widgets.Select(widget => $"{widget.WidgetType}: {Math.Round(widget.X)},{Math.Round(widget.Y)}"));
     }
 }

@@ -51,7 +51,7 @@ The app currently includes:
 - Preset gallery and desktop environment roadmap cards.
 - Theme package gallery, import/export controls, custom theme editor, and live preview in the Customization Themes subsection.
 - Taskbar Lab V1 in the Customization Taskbar subsection, with read-only current-user taskbar state detection, preview-only taskbar presets, safety toggles, and an app-only live taskbar mockup.
-- Desktop Widgets Overlay V1 in the Customization Desktop Widgets subsection, with persisted widget settings, an app-owned Avalonia overlay window controller, Clock and System Monitor Lite overlay widgets, planned widget definitions, and a live preview.
+- Desktop Widgets Overlay V2 in the Customization Desktop Widgets subsection, with persisted widget settings, an app-owned Avalonia overlay window controller, draggable/resizable Clock and System Monitor Lite overlay widgets, saved positions/sizes, lock/unlock controls, planned widget definitions, and a live preview.
 
 ## Existing Modules
 
@@ -150,7 +150,7 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 - `MainWindowViewModel` and `MainWindow.axaml` now act as shell/navigation host; module behavior lives in page-specific view models and views.
 - Customization Start menu, launcher, layout, and Risk Lab sections are planning UI only.
 - Taskbar Lab V1 is preview-first. It does not replace the real taskbar, hook Explorer, patch Explorer, restart Explorer, or implement real blur/acrylic taskbar effects.
-- Desktop Widgets Overlay V1 uses app-owned Avalonia windows only. It does not replace the desktop, integrate with Explorer, install services, or use global hooks. Widget dragging/position capture and real system-wide metrics are future work.
+- Desktop Widgets Overlay V2 uses app-owned Avalonia windows only. It does not replace the desktop, integrate with Explorer, install services, or use global hooks. Widgets can be dragged/resized while unlocked and persist their bounds. System Monitor Lite currently reports app CPU and app memory/GC memory budget; broader system-wide CPU/RAM telemetry is future work.
 - Theme package import uses a path textbox rather than a native file picker.
 - System accent color and wallpaper changes are not implemented.
 - No global hotkeys yet.
@@ -165,7 +165,7 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 1. Improve app-level dynamic styling beyond the Customization live preview.
 2. Add native file picker support for theme import/export.
 3. Expand Taskbar Lab only with safe, reversible changes; real taskbar blur/replacement remains future Risk Lab work.
-4. Improve Desktop Widgets with optional dragging/position save and lightweight real metrics.
+4. Improve Desktop Widgets with richer lightweight system metrics and additional widget types.
 5. Add Command Launcher and hotkey support.
 6. Add Layout Engine for save/restore and tiling.
 7. Keep Risk Lab isolated and explicit.

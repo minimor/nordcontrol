@@ -4,6 +4,10 @@ namespace NordControl.Core.Services;
 
 public interface IDesktopWidgetService
 {
+    bool IsWidgetsVisible { get; }
+
+    int ActiveWidgetCount { get; }
+
     IReadOnlyList<DesktopWidgetDefinition> GetDefinitions();
 
     DesktopWidgetSettings LoadSettings(AppSettings settings);
@@ -17,4 +21,10 @@ public interface IDesktopWidgetService
     WidgetOperationResult ToggleWidgets();
 
     WidgetOperationResult ResetWidgetLayout();
+
+    WidgetOperationResult SaveWidgetBounds(string widgetId, double x, double y, double width, double height);
+
+    WidgetOperationResult HideWidget(string widgetId, bool disable);
+
+    string GetWidgetLayoutSummary();
 }

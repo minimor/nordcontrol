@@ -42,6 +42,16 @@ public sealed class DesktopWidgetSettings
         EnsureDefaultWidget(DesktopWidgetCatalog.SystemMonitorLiteWidgetKey);
     }
 
+    public void NormalizeForVisibleArea(double visibleWidth, double visibleHeight)
+    {
+        Normalize();
+
+        foreach (var widget in Widgets)
+        {
+            widget.NormalizeForVisibleArea(visibleWidth, visibleHeight);
+        }
+    }
+
     private void EnsureDefaultWidget(string widgetType)
     {
         if (Widgets.Any(widget => string.Equals(widget.WidgetType, widgetType, StringComparison.Ordinal)))

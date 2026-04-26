@@ -291,6 +291,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     private bool startWidgetsWithApp;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DesktopWidgetLockStatusText))]
     private bool lockWidgetPositions;
 
     [ObservableProperty]
@@ -311,6 +312,15 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
 
     [ObservableProperty]
     private string desktopWidgetPreviewAccentHex = "#A78BFA";
+
+    [ObservableProperty]
+    private string desktopWidgetVisibilityText = "Hidden";
+
+    [ObservableProperty]
+    private int activeDesktopWidgetCount;
+
+    [ObservableProperty]
+    private string desktopWidgetLayoutSummary = "Clock and System Monitor Lite use default positions.";
 
     public string PersonalizationLastLoadedText =>
         PersonalizationLastLoadedAt?.ToString("HH:mm:ss") ?? "Not loaded";
@@ -360,6 +370,8 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     public string DesktopWidgetsStatusBadge => EnableDesktopWidgets ? "Safe Overlay On" : "Safe Overlay Off";
 
     public double DesktopWidgetPreviewOpacity => Math.Clamp(DesktopWidgetGlobalOpacity, 0.2, 1.0);
+
+    public string DesktopWidgetLockStatusText => LockWidgetPositions ? "Positions locked" : "Positions unlocked";
 
     partial void OnSelectedCustomizationSectionChanged(CustomizationSectionViewModel? value)
     {
@@ -445,6 +457,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     {
         var result = desktopWidgetService.ShowWidgets();
         DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+        RefreshDesktopWidgetRuntimeStatus();
     }
 
     [RelayCommand]
@@ -452,6 +465,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     {
         var result = desktopWidgetService.HideWidgets();
         DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+        RefreshDesktopWidgetRuntimeStatus();
     }
 
     [RelayCommand]
@@ -460,6 +474,24 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         var result = desktopWidgetService.ResetWidgetLayout();
         DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
         ApplyDesktopWidgetSettings(appStateService.Settings.Customization.DesktopWidgets);
+        RefreshDesktopWidgetRuntimeStatus();
+    }
+
+    [RelayCommand]
+    private void ToggleDesktopWidgetPositionLock()
+    {
+        LockWidgetPositions = !LockWidgetPositions;
+        DesktopWidgetStatusMessage = LockWidgetPositions
+            ? "Widget positions locked."
+            : "Widget positions unlocked. Drag widget headers to move them.";
+    }
+
+    [RelayCommand]
+    private void SaveDesktopWidgetLayout()
+    {
+        var result = desktopWidgetService.SaveSettings(appStateService.Settings.Customization.DesktopWidgets);
+        DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+        RefreshDesktopWidgetRuntimeStatus();
     }
 
     [RelayCommand]
@@ -546,6 +578,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         RefreshSelectedThemeState();
         ApplyTaskbarPresetToPreview(SelectedTaskbarPresetKey);
         RefreshCustomizationFeatureCards();
+        RefreshDesktopWidgetRuntimeStatus();
     }
 
     private void LoadPersonalizationState()
@@ -708,6 +741,8 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
                 widget.IsEnabled &&
                 string.Equals(widget.WidgetType, definition.Key, StringComparison.Ordinal));
         }
+
+        RefreshDesktopWidgetRuntimeStatus();
     }
 
     private void PersistDesktopWidgetSettings(Action<DesktopWidgetSettings> update)
@@ -757,6 +792,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
             DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
         }
 
+        RefreshDesktopWidgetRuntimeStatus();
         return true;
     }
 
@@ -776,6 +812,14 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
 
         var result = desktopWidgetService.ShowWidgets();
         DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+        RefreshDesktopWidgetRuntimeStatus();
+    }
+
+    private void RefreshDesktopWidgetRuntimeStatus()
+    {
+        ActiveDesktopWidgetCount = desktopWidgetService.ActiveWidgetCount;
+        DesktopWidgetVisibilityText = desktopWidgetService.IsWidgetsVisible ? "Visible" : "Hidden";
+        DesktopWidgetLayoutSummary = desktopWidgetService.GetWidgetLayoutSummary();
     }
 
     private static string BuildWidgetStatusMessage(WidgetOperationResult result)

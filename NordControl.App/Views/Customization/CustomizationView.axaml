@@ -1282,6 +1282,57 @@
                                    Foreground="#F4F7FA"
                                    FontSize="18"
                                    FontWeight="SemiBold"/>
+                        <Grid ColumnDefinitions="*,*,*"
+                              ColumnSpacing="8">
+                            <Border Background="#223040"
+                                    BorderBrush="#435A73"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="10">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Visible"
+                                               Foreground="#8FA1B3"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding DesktopWidgetVisibilityText}"
+                                               Foreground="#F4F7FA"
+                                               FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1"
+                                    Background="#223040"
+                                    BorderBrush="#435A73"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="10">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Active"
+                                               Foreground="#8FA1B3"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding ActiveDesktopWidgetCount}"
+                                               Foreground="#F4F7FA"
+                                               FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2"
+                                    Background="#223040"
+                                    BorderBrush="#435A73"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="10">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Lock"
+                                               Foreground="#8FA1B3"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding DesktopWidgetLockStatusText}"
+                                               Foreground="#F4F7FA"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
                         <CheckBox Content="Enable Widgets"
                                   IsChecked="{Binding EnableDesktopWidgets, Mode=TwoWay}"/>
                         <CheckBox Content="Start Widgets With App"
@@ -1321,6 +1372,24 @@
                                     Content="Reset Layout"
                                     Command="{Binding ResetDesktopWidgetLayoutCommand}"/>
                         </Grid>
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="8">
+                            <Button Content="Lock / Unlock Positions"
+                                    Command="{Binding ToggleDesktopWidgetPositionLockCommand}"/>
+                            <Button Grid.Column="1"
+                                    Content="Save Layout"
+                                    Command="{Binding SaveDesktopWidgetLayoutCommand}"/>
+                        </Grid>
+                        <Border Background="#111821"
+                                BorderBrush="#304459"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="10">
+                            <TextBlock Text="{Binding DesktopWidgetLayoutSummary}"
+                                       Foreground="#AFC2D3"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"/>
+                        </Border>
                     </StackPanel>
                 </Border>
 
@@ -1380,10 +1449,16 @@
                                         CornerRadius="8"
                                         Padding="14">
                                     <StackPanel Spacing="6">
-                                        <TextBlock Text="Clock"
-                                                   Foreground="#8FA1B3"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"/>
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Text="Clock"
+                                                       Foreground="#8FA1B3"
+                                                       FontSize="12"
+                                                       FontWeight="SemiBold"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding DesktopWidgetLockStatusText}"
+                                                       Foreground="#4CC2FF"
+                                                       FontSize="10"/>
+                                        </Grid>
                                         <TextBlock Text="14:32:08"
                                                    Foreground="#F4F7FA"
                                                    FontSize="28"
@@ -1403,11 +1478,11 @@
                                                    Foreground="#8FA1B3"
                                                    FontSize="12"
                                                    FontWeight="SemiBold"/>
-                                        <TextBlock Text="CPU: placeholder"
+                                        <TextBlock Text="App CPU: live"
                                                    Foreground="#F4F7FA"
                                                    FontSize="18"
                                                    FontWeight="SemiBold"/>
-                                        <TextBlock Text="Memory: prepared"
+                                        <TextBlock Text="App memory: live"
                                                    Foreground="#AFC2D3"/>
                                     </StackPanel>
                                 </Border>

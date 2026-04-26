@@ -51,7 +51,6 @@ High risk:
 - Real taskbar blur/acrylic implementation
 - Taskbar replacement or Explorer-integrated taskbar modules
 - Desktop widgets
-- Widget dragging and saved overlay positions
 - Rich system metrics widgets
 - Launcher
 - Tiling manager
@@ -74,8 +73,8 @@ Taskbar Lab V1 is implemented as a safe foundation in Customization -> Taskbar. 
 
 V1 does not patch Explorer, inject into Explorer, install shell hooks, replace the real taskbar, restart Explorer, or implement real taskbar blur/acrylic. Those ideas remain future Risk Lab work and require explicit confirmation, logging, and rollback planning before any implementation.
 
-## Desktop Widgets Overlay V1 Boundary
+## Desktop Widgets Overlay V2 Boundary
 
-Desktop Widgets Overlay V1 is implemented as app-owned Avalonia windows controlled by NordControl. V1 includes Clock and System Monitor Lite widgets, manual show/hide/reset controls, persisted settings, and preview UI inside Customization -> Desktop Widgets.
+Desktop Widgets Overlay V2 is implemented as app-owned Avalonia windows controlled by NordControl. V2 includes draggable/resizable Clock and System Monitor Lite widgets, saved positions and sizes, manual show/hide/reset controls, persisted settings, lock/unlock behavior, and preview/status UI inside Customization -> Desktop Widgets.
 
-V1 does not patch Explorer, inject into the shell, replace the desktop, install services, add global hooks, create shell extensions, or modify registry keys. Dragging with saved positions and richer live system metrics are future improvements.
+V2 does not patch Explorer, inject into the shell, replace the desktop, install services, add global hooks, create shell extensions, or modify registry keys. System Monitor Lite reports safe app-owned metrics for now; richer system-wide metrics remain future work and should stay lightweight and reversible.

@@ -78,13 +78,16 @@ Branch/commit note: Commit to `dev` unless asked otherwise.
 
 Goal: Add a safe overlay window architecture for widgets.
 
-Status: Implemented as a safe foundation. Desktop Widgets Overlay V1 now lives inside Customization -> Desktop Widgets with persisted widget settings, a definition catalog, app-owned Avalonia overlay windows, manual show/hide/reset controls, Clock and System Monitor Lite widgets, planned widget cards, and a live preview.
+Status: Implemented and improved. Desktop Widgets Overlay V2 now lives inside Customization -> Desktop Widgets with persisted widget settings, a definition catalog, app-owned Avalonia overlay windows, manual show/hide/reset controls, draggable/resizable Clock and System Monitor Lite widgets, saved positions and sizes, lock/unlock controls, planned widget cards, runtime status, and a live preview.
 
 Deliverables:
 
 - Separate app-owned overlay widget windows
-- Clock widget
-- System Monitor Lite widget with lightweight placeholder metrics
+- Draggable and resizable widgets when unlocked
+- Saved widget positions and sizes
+- Screen-safe bounds normalization and reset layout defaults
+- Improved Clock widget
+- System Monitor Lite widget with app CPU, app memory, and GC memory budget values
 - Planned Music Controls, Quick Notes, Shortcuts Panel, Weather, and Performance Monitor definitions
 - Widget settings model and normalization
 - Manual show/hide/reset lifecycle controls

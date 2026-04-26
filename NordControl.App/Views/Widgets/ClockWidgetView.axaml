@@ -3,24 +3,30 @@
              xmlns:vm="using:NordControl.App.ViewModels.Widgets"
              x:Class="NordControl.App.Views.Widgets.ClockWidgetView"
              x:DataType="vm:DesktopWidgetWindowViewModel">
-    <StackPanel Spacing="8">
-        <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Clock"
-                       Foreground="#8FA1B3"
-                       FontSize="12"
-                       FontWeight="SemiBold"/>
-            <Border Grid.Column="1"
-                    Background="{Binding AccentColorHex}"
-                    Width="26"
-                    Height="8"
-                    CornerRadius="4"/>
-        </Grid>
+    <StackPanel Spacing="10">
+        <TextBlock Text="{Binding CurrentDay}"
+                   Foreground="{Binding AccentColorHex}"
+                   FontSize="13"
+                   FontWeight="SemiBold"/>
         <TextBlock Text="{Binding CurrentTime}"
                    Foreground="#F4F7FA"
-                   FontSize="34"
-                   FontWeight="SemiBold"/>
+                   FontSize="40"
+                   FontWeight="SemiBold"
+                   LetterSpacing="0"/>
         <TextBlock Text="{Binding CurrentDate}"
                    Foreground="#AFC2D3"
                    FontSize="14"/>
+        <Grid ColumnDefinitions="*,36"
+              ColumnSpacing="10">
+            <Border Height="8"
+                    Background="{Binding AccentColorHex}"
+                    CornerRadius="4"
+                    Opacity="0.8"/>
+            <Border Grid.Column="1"
+                    Height="8"
+                    Background="#8FA1B3"
+                    CornerRadius="4"
+                    Opacity="0.38"/>
+        </Grid>
     </StackPanel>
 </UserControl>

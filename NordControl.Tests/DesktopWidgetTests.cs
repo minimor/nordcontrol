@@ -64,6 +64,84 @@ public sealed class DesktopWidgetTests
     }
 
     [Fact]
+    public void WidgetInstanceNormalizeClampsSizeToReasonableBounds()
+    {
+        var settings = new DesktopWidgetInstanceSettings
+        {
+            Width = 40,
+            Height = 2000
+        };
+
+        settings.Normalize();
+
+        Assert.Equal(DesktopWidgetInstanceSettings.MinWidth, settings.Width);
+        Assert.Equal(DesktopWidgetInstanceSettings.MaxHeight, settings.Height);
+    }
+
+    [Fact]
+    public void WidgetInstanceNormalizeForVisibleAreaKeepsWidgetReachable()
+    {
+        var settings = new DesktopWidgetInstanceSettings
+        {
+            X = 5000,
+            Y = 4000,
+            Width = 420,
+            Height = 260
+        };
+
+        settings.NormalizeForVisibleArea(1024, 768);
+
+        Assert.InRange(settings.X, 0, 1024);
+        Assert.InRange(settings.Y, 0, 768);
+        Assert.True(settings.X <= 944);
+        Assert.True(settings.Y <= 688);
+    }
+
+    [Fact]
+    public void DesktopWidgetSettingsNormalizeForVisibleAreaAppliesToAllWidgets()
+    {
+        var settings = new DesktopWidgetSettings
+        {
+            Widgets =
+            [
+                new DesktopWidgetInstanceSettings
+                {
+                    Id = "clock",
+                    WidgetType = DesktopWidgetCatalog.ClockWidgetKey,
+                    X = 9999,
+                    Y = 9999
+                },
+                new DesktopWidgetInstanceSettings
+                {
+                    Id = "system",
+                    WidgetType = DesktopWidgetCatalog.SystemMonitorLiteWidgetKey,
+                    X = 9999,
+                    Y = 9999
+                }
+            ]
+        };
+
+        settings.NormalizeForVisibleArea(800, 600);
+
+        Assert.All(settings.Widgets, widget =>
+        {
+            Assert.True(widget.X <= 720);
+            Assert.True(widget.Y <= 520);
+        });
+    }
+
+    [Fact]
+    public void DefaultWidgetLayoutUsesStableImplementedWidgets()
+    {
+        var widgets = DesktopWidgetCatalog.CreateDefaultWidgetInstances();
+
+        Assert.Equal(2, widgets.Count);
+        Assert.Equal("clock-default", widgets[0].Id);
+        Assert.Equal("system-monitor-lite-default", widgets[1].Id);
+        Assert.All(widgets, widget => Assert.True(DesktopWidgetCatalog.IsImplementedWidgetType(widget.WidgetType)));
+    }
+
+    [Fact]
     public void UnknownWidgetTypesAreDisabledSafely()
     {
         var settings = new DesktopWidgetSettings
