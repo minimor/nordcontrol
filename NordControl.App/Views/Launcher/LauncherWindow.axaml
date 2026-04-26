@@ -1,0 +1,129 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:NordControl.App.ViewModels.Launcher"
+        x:Class="NordControl.App.Views.Launcher.LauncherWindow"
+        x:DataType="vm:LauncherViewModel"
+        Width="760"
+        Height="560"
+        WindowStartupLocation="CenterScreen"
+        WindowDecorations="None"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Background="Transparent"
+        TransparencyLevelHint="AcrylicBlur,Transparent"
+        ExtendClientAreaToDecorationsHint="True">
+    <Border Background="#EE101820"
+            BorderBrush="#4CC2FF"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="0">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <Border Background="#33111A24"
+                    Padding="22,20">
+                <Grid RowDefinitions="Auto,Auto"
+                      RowSpacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="Nord Launcher"
+                                       Foreground="#F4F7FA"
+                                       FontSize="24"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="Commands, apps, widgets, modules"
+                                       Foreground="#8FA1B3"/>
+                        </StackPanel>
+                        <Border Grid.Column="1"
+                                Background="#223040"
+                                BorderBrush="#435A73"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="10,6"
+                                VerticalAlignment="Top">
+                            <TextBlock Text="Ctrl+Space"
+                                       Foreground="#B7D7F2"
+                                       FontWeight="SemiBold"/>
+                        </Border>
+                    </Grid>
+                    <TextBox x:Name="SearchBox"
+                             Grid.Row="1"
+                             Text="{Binding Query, Mode=TwoWay}"
+                             PlaceholderText="Search commands, apps, themes, widgets..."
+                             FontSize="22"
+                             MinHeight="52"
+                             Padding="14,10"/>
+                </Grid>
+            </Border>
+
+            <ListBox Grid.Row="1"
+                     ItemsSource="{Binding Results}"
+                     SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Margin="14">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LauncherResultViewModel">
+                        <Button Command="{Binding ExecuteCommand}"
+                                HorizontalAlignment="Stretch"
+                                Padding="0"
+                                Margin="0,0,0,8">
+                            <Border Background="#1B2530"
+                                    BorderBrush="#304459"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12">
+                                <Grid ColumnDefinitions="44,*,Auto"
+                                      ColumnSpacing="12">
+                                    <Border Background="#223040"
+                                            BorderBrush="#435A73"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Width="40"
+                                            Height="40">
+                                        <TextBlock Text="{Binding IconHint}"
+                                                   Foreground="#8CF5D2"
+                                                   FontSize="18"
+                                                   FontWeight="SemiBold"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1"
+                                                Spacing="3">
+                                        <TextBlock Text="{Binding Title}"
+                                                   Foreground="#F4F7FA"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Subtitle}"
+                                                   Foreground="#AFC2D3"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2"
+                                                Spacing="5"
+                                                HorizontalAlignment="Right">
+                                        <TextBlock Text="{Binding Category}"
+                                                   Foreground="#8CF5D2"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding RiskLevel}"
+                                                   Foreground="#FFD166"
+                                                   FontSize="12"
+                                                   HorizontalAlignment="Right"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Button>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Border Grid.Row="2"
+                    Background="#33111A24"
+                    Padding="18,12">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="#AFC2D3"/>
+                    <TextBlock Grid.Column="1"
+                               Text="Enter execute | Esc close | Up/Down navigate"
+                               Foreground="#8FA1B3"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

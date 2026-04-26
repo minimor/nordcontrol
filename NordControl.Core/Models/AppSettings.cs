@@ -10,6 +10,8 @@ public sealed class AppSettings
 
     public CustomizationSettings Customization { get; set; } = new();
 
+    public LauncherSettings Launcher { get; set; } = new();
+
     public static AppSettings CreateDefault()
     {
         return new AppSettings();
@@ -32,5 +34,8 @@ public sealed class AppSettings
 
         Customization ??= new CustomizationSettings();
         Customization.Normalize();
+
+        Launcher ??= new LauncherSettings();
+        Launcher.Normalize();
     }
 }

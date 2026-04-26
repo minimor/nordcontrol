@@ -78,6 +78,33 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private bool allowLowRiskWindowsPersonalization = true;
 
+    [ObservableProperty]
+    private bool enableLauncher = true;
+
+    [ObservableProperty]
+    private bool launcherStartWithApp = true;
+
+    [ObservableProperty]
+    private string launcherHotkeyGesture = "Ctrl+Space";
+
+    [ObservableProperty]
+    private bool launcherShowOnStartup;
+
+    [ObservableProperty]
+    private bool launcherIncludeNordControlCommands = true;
+
+    [ObservableProperty]
+    private bool launcherIncludeApps = true;
+
+    [ObservableProperty]
+    private bool launcherIncludeSystemActions = true;
+
+    [ObservableProperty]
+    private bool launcherCloseAfterAction = true;
+
+    [ObservableProperty]
+    private int launcherMaxResults = 10;
+
     public string AutoRefreshStatus => AutoRefreshIntervalSeconds <= 0
         ? "Auto-refresh disabled."
         : $"Auto-refresh every {AutoRefreshIntervalSeconds} seconds.";
@@ -132,6 +159,15 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
         NordControlAccentColorHex = settings.Customization.NordControlAccentColorHex;
         EnableGlassStyleInApp = settings.Customization.EnableGlassStyleInApp;
         AllowLowRiskWindowsPersonalization = settings.Customization.AllowLowRiskWindowsPersonalization;
+        EnableLauncher = settings.Launcher.EnableLauncher;
+        LauncherStartWithApp = settings.Launcher.StartWithApp;
+        LauncherHotkeyGesture = settings.Launcher.HotkeyGesture;
+        LauncherShowOnStartup = settings.Launcher.ShowOnStartup;
+        LauncherIncludeNordControlCommands = settings.Launcher.IncludeNordControlCommands;
+        LauncherIncludeApps = settings.Launcher.IncludeApps;
+        LauncherIncludeSystemActions = settings.Launcher.IncludeSystemActions;
+        LauncherCloseAfterAction = settings.Launcher.CloseAfterAction;
+        LauncherMaxResults = settings.Launcher.MaxResults;
         SettingsStatusMessage = appStateService.LastStatusMessage;
 
         isApplyingSettings = false;
@@ -151,9 +187,20 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
         settings.Customization.NordControlAccentColorHex = NordControlAccentColorHex;
         settings.Customization.EnableGlassStyleInApp = EnableGlassStyleInApp;
         settings.Customization.AllowLowRiskWindowsPersonalization = AllowLowRiskWindowsPersonalization;
+        settings.Launcher.EnableLauncher = EnableLauncher;
+        settings.Launcher.StartWithApp = LauncherStartWithApp;
+        settings.Launcher.HotkeyGesture = LauncherHotkeyGesture;
+        settings.Launcher.ShowOnStartup = LauncherShowOnStartup;
+        settings.Launcher.IncludeNordControlCommands = LauncherIncludeNordControlCommands;
+        settings.Launcher.IncludeApps = LauncherIncludeApps;
+        settings.Launcher.IncludeSystemActions = LauncherIncludeSystemActions;
+        settings.Launcher.CloseAfterAction = LauncherCloseAfterAction;
+        settings.Launcher.MaxResults = LauncherMaxResults;
         settings.Normalize();
         AutoRefreshIntervalSeconds = settings.WindowManager.AutoRefreshIntervalSeconds;
         NordControlAccentColorHex = settings.Customization.NordControlAccentColorHex;
+        LauncherHotkeyGesture = settings.Launcher.HotkeyGesture;
+        LauncherMaxResults = settings.Launcher.MaxResults;
     }
 
     private void OnSettingsChanged(object? sender, EventArgs e)

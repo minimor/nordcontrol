@@ -40,6 +40,11 @@ public partial class App : Application
             var desktopWidgetService = serviceProvider.GetRequiredService<DesktopWidgetService>();
             desktopWidgetService.ShowStartupWidgetsIfEnabled();
             desktop.Exit += (_, _) => desktopWidgetService.HideWidgets();
+
+            if (serviceProvider.GetRequiredService<IAppStateService>().Settings.Launcher.ShowOnStartup)
+            {
+                serviceProvider.GetRequiredService<LauncherWindowService>().ShowLauncher();
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -57,6 +62,9 @@ public partial class App : Application
         services.AddSingleton<IDesktopWidgetService>(provider => provider.GetRequiredService<DesktopWidgetService>());
         services.AddSingleton<IThemePackageService, JsonThemePackageService>();
         services.AddSingleton<IAppStateService, AppStateService>();
+        services.AddSingleton<LauncherService>();
+        services.AddSingleton<ILauncherService>(provider => provider.GetRequiredService<LauncherService>());
+        services.AddSingleton<LauncherWindowService>();
         services.AddSingleton<WindowManagerViewModel>();
         services.AddSingleton<DashboardViewModel>();
         services.AddSingleton<CustomizationViewModel>();

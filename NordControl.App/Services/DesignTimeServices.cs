@@ -233,3 +233,33 @@ internal sealed class DesignTimeDesktopWidgetService : IDesktopWidgetService
         return string.Join(", ", settings.Widgets.Select(widget => $"{widget.WidgetType}: {Math.Round(widget.X)},{Math.Round(widget.Y)}"));
     }
 }
+
+internal sealed class DesignTimeLauncherService : ILauncherService
+{
+    public bool CloseAfterAction => true;
+
+    public IReadOnlyList<LauncherCommand> GetCommands()
+    {
+        return NordControl.Core.Modules.LauncherCommandCatalog.BuiltInCommands;
+    }
+
+    public IReadOnlyList<LauncherSearchResult> Search(string query)
+    {
+        return NordControl.Core.Modules.LauncherSearchEngine.Search(GetCommands(), query, 10);
+    }
+
+    public LauncherOperationResult Execute(LauncherCommand command)
+    {
+        return LauncherOperationResult.Succeeded($"Design-time command executed: {command.Title}");
+    }
+
+    public LauncherOperationResult RegisterHotkey()
+    {
+        return LauncherOperationResult.Failed("Design-time global hotkey is unavailable.");
+    }
+
+    public LauncherOperationResult UnregisterHotkey()
+    {
+        return LauncherOperationResult.Succeeded("Design-time hotkey unregistered.");
+    }
+}

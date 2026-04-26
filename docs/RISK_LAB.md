@@ -43,6 +43,7 @@ High risk:
 - Prefer preview-only UI until the implementation is understood.
 - Keep Taskbar Lab V1 app-only except for read-only current-user state detection.
 - Keep Desktop Widgets Overlay V1 app-owned and hideable from NordControl.
+- Keep Command Launcher app-owned; global hotkey registration must be reversible and must not hook Explorer.
 
 ## Future Experimental Ideas
 
@@ -53,6 +54,7 @@ High risk:
 - Desktop widgets
 - Rich system metrics widgets
 - Launcher
+- Native global hotkey registration for the launcher
 - Tiling manager
 - Custom Alt+Tab
 - Virtual desktop viewer
@@ -78,3 +80,9 @@ V1 does not patch Explorer, inject into Explorer, install shell hooks, replace t
 Desktop Widgets Overlay V2 is implemented as app-owned Avalonia windows controlled by NordControl. V2 includes draggable/resizable Clock and System Monitor Lite widgets, saved positions and sizes, manual show/hide/reset controls, persisted settings, lock/unlock behavior, and preview/status UI inside Customization -> Desktop Widgets.
 
 V2 does not patch Explorer, inject into the shell, replace the desktop, install services, add global hooks, create shell extensions, or modify registry keys. System Monitor Lite reports safe app-owned metrics for now; richer system-wide metrics remain future work and should stay lightweight and reversible.
+
+## Command Launcher V1 Boundary
+
+Command Launcher V1 is implemented as an app-owned Avalonia overlay with command search, keyboard navigation, NordControl actions, widget controls, safe system actions, and Start Menu shortcut app search.
+
+V1 does not patch Explorer, inject into the shell, replace Start menu, replace the taskbar, install services, or create shell extensions. Native global hotkey registration is planned but not active in V1; `Ctrl+Space` works while NordControl is focused and the visible Launcher button opens the overlay.

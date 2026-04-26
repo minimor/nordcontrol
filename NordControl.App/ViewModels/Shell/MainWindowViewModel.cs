@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using NordControl.App.Services;
 using NordControl.App.ViewModels.Customization;
 using NordControl.App.ViewModels.Dashboard;
@@ -20,6 +21,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly DashboardViewModel dashboardViewModel;
     private readonly SettingsViewModel settingsViewModel;
     private readonly CustomizationViewModel customizationViewModel;
+    private readonly LauncherWindowService launcherWindowService;
+    private readonly LauncherService? launcherService;
     private readonly Dictionary<string, ViewModelBase> pageViewModels;
     private bool isApplyingSettings;
 
@@ -28,7 +31,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             new AppStateService(new DesignTimeAppSettingsService()),
             new DesignTimePlatformInfoService(),
             new WindowManagerViewModel(),
-            new CustomizationViewModel())
+            new CustomizationViewModel(),
+            new LauncherWindowService(new DesignTimeLauncherService()),
+            null)
     {
     }
 
@@ -36,14 +41,18 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         IAppStateService appStateService,
         IPlatformInfoService platformInfoService,
         WindowManagerViewModel windowManagerViewModel,
-        CustomizationViewModel customizationViewModel)
+        CustomizationViewModel customizationViewModel,
+        LauncherWindowService launcherWindowService,
+        LauncherService? launcherService)
         : this(
             appStateService,
             platformInfoService,
             windowManagerViewModel,
             new DashboardViewModel(windowManagerViewModel),
             new SettingsViewModel(appStateService, customizationViewModel),
-            customizationViewModel)
+            customizationViewModel,
+            launcherWindowService,
+            launcherService)
     {
     }
 
@@ -53,13 +62,17 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         WindowManagerViewModel windowManagerViewModel,
         DashboardViewModel dashboardViewModel,
         SettingsViewModel settingsViewModel,
-        CustomizationViewModel customizationViewModel)
+        CustomizationViewModel customizationViewModel,
+        LauncherWindowService launcherWindowService,
+        LauncherService? launcherService)
     {
         this.appStateService = appStateService;
         this.windowManagerViewModel = windowManagerViewModel;
         this.dashboardViewModel = dashboardViewModel;
         this.settingsViewModel = settingsViewModel;
         this.customizationViewModel = customizationViewModel;
+        this.launcherWindowService = launcherWindowService;
+        this.launcherService = launcherService;
 
         Modules = AppModuleCatalog.DefaultModules
             .Select(module => new ShellModuleViewModel(module))
@@ -80,6 +93,13 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         isApplyingSettings = false;
 
         UpdateCurrentPageViewModel();
+
+        if (this.launcherService is not null)
+        {
+            this.launcherService.NavigationRequested += NavigateToModule;
+            this.launcherService.CustomizationSectionRequested += NavigateToCustomizationSection;
+            this.launcherService.WindowRefreshRequested += RefreshWindowsFromLauncher;
+        }
     }
 
     public IReadOnlyList<ShellModuleViewModel> Modules { get; }
@@ -105,6 +125,17 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public string PlatformSummary =>
         $"{PlatformInfo.OperatingSystem} | {PlatformInfo.Runtime} | {PlatformInfo.Architecture}";
 
+    [RelayCommand]
+    public void OpenLauncher()
+    {
+        launcherWindowService.ShowLauncher();
+    }
+
+    public void ToggleLauncher()
+    {
+        launcherWindowService.ToggleLauncher();
+    }
+
     partial void OnSelectedModuleChanged(ShellModuleViewModel? value)
     {
         UpdateCurrentPageViewModel();
@@ -120,6 +151,13 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     public void Dispose()
     {
+        if (launcherService is not null)
+        {
+            launcherService.NavigationRequested -= NavigateToModule;
+            launcherService.CustomizationSectionRequested -= NavigateToCustomizationSection;
+            launcherService.WindowRefreshRequested -= RefreshWindowsFromLauncher;
+        }
+
         dashboardViewModel.Dispose();
         windowManagerViewModel.Dispose();
         settingsViewModel.Dispose();
@@ -137,5 +175,22 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         CurrentPageViewModel = pageViewModels.TryGetValue(SelectedModule.Key, out var pageViewModel)
             ? pageViewModel
             : new ModulePlaceholderViewModel(SelectedModule);
+    }
+
+    private void NavigateToModule(string moduleKey)
+    {
+        SelectedModule = Modules.FirstOrDefault(module => string.Equals(module.Key, moduleKey, StringComparison.Ordinal))
+            ?? SelectedModule;
+    }
+
+    private void NavigateToCustomizationSection(string sectionKey)
+    {
+        NavigateToModule("customization");
+        customizationViewModel.NavigateToCustomizationSection(sectionKey);
+    }
+
+    private void RefreshWindowsFromLauncher()
+    {
+        _ = windowManagerViewModel.RefreshWindowsAsync();
     }
 }

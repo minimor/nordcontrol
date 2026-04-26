@@ -993,6 +993,13 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         SelectedCustomizationSection = section;
     }
 
+    public void NavigateToCustomizationSection(string sectionKey)
+    {
+        SelectedCustomizationSection = CustomizationSections
+            .FirstOrDefault(section => string.Equals(section.Key, sectionKey, StringComparison.Ordinal))
+            ?? SelectedCustomizationSection;
+    }
+
     private void RefreshCustomizationFeatureCards()
     {
         CurrentCustomizationFeatureCards.Clear();

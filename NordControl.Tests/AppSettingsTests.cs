@@ -37,6 +37,14 @@ public sealed class AppSettingsTests
         Assert.Equal(0.92, settings.Customization.DesktopWidgets.GlobalOpacity);
         Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "clock");
         Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "system-monitor-lite");
+        Assert.True(settings.Launcher.EnableLauncher);
+        Assert.True(settings.Launcher.StartWithApp);
+        Assert.Equal("Ctrl+Space", settings.Launcher.HotkeyGesture);
+        Assert.True(settings.Launcher.IncludeNordControlCommands);
+        Assert.True(settings.Launcher.IncludeApps);
+        Assert.True(settings.Launcher.IncludeSystemActions);
+        Assert.True(settings.Launcher.CloseAfterAction);
+        Assert.Equal(10, settings.Launcher.MaxResults);
     }
 
     [Fact]
@@ -59,6 +67,8 @@ public sealed class AppSettingsTests
                 IsEnabled = true
             }
         ];
+        settings.Launcher.HotkeyGesture = "not-real";
+        settings.Launcher.MaxResults = 1000;
 
         settings.Normalize();
 
@@ -72,6 +82,8 @@ public sealed class AppSettingsTests
         Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "clock");
         Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "system-monitor-lite");
         Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "unknown-widget" && !widget.IsEnabled);
+        Assert.Equal("Ctrl+Space", settings.Launcher.HotkeyGesture);
+        Assert.Equal(20, settings.Launcher.MaxResults);
     }
 
     [Fact]

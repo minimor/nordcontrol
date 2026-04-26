@@ -107,7 +107,8 @@
 
         <ScrollViewer Grid.Column="1">
             <StackPanel Margin="34,30,34,34" Spacing="22">
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto,Auto"
+                      ColumnSpacing="10">
                     <StackPanel Spacing="6">
                         <TextBlock Text="{Binding ActiveModuleName}"
                                    Foreground="#F4F7FA"
@@ -132,6 +133,11 @@
                                    FontSize="12"
                                    FontWeight="SemiBold"/>
                     </Border>
+                    <Button Grid.Column="2"
+                            Content="Launcher"
+                            Command="{Binding OpenLauncherCommand}"
+                            VerticalAlignment="Top"
+                            Padding="14,8"/>
                 </Grid>
 
                 <ContentControl Content="{Binding CurrentPageViewModel}"/>

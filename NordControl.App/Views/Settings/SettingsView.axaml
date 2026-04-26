@@ -164,6 +164,58 @@
             </StackPanel>
         </Border>
 
+        <Border Background="#161D24"
+                BorderBrush="#273442"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="18">
+            <StackPanel Spacing="14">
+                <TextBlock Text="Command Launcher"
+                           Foreground="#F4F7FA"
+                           FontSize="18"
+                           FontWeight="SemiBold"/>
+                <CheckBox Content="Enable Launcher"
+                          IsChecked="{Binding EnableLauncher, Mode=TwoWay}"/>
+                <CheckBox Content="Start launcher services with app"
+                          IsChecked="{Binding LauncherStartWithApp, Mode=TwoWay}"/>
+                <Grid ColumnDefinitions="220,*"
+                      ColumnSpacing="12">
+                    <TextBlock Text="Hotkey"
+                               Foreground="#D8E1EA"
+                               VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1"
+                             Text="{Binding LauncherHotkeyGesture, Mode=TwoWay}"
+                             MinHeight="34"/>
+                </Grid>
+                <TextBlock Text="V1 supports Ctrl+Space while NordControl is focused. Native global hotkey registration is planned after the window message pump is isolated."
+                           Foreground="#8FA1B3"
+                           TextWrapping="Wrap"/>
+                <CheckBox Content="Show launcher on startup"
+                          IsChecked="{Binding LauncherShowOnStartup, Mode=TwoWay}"/>
+                <CheckBox Content="Include NordControl commands"
+                          IsChecked="{Binding LauncherIncludeNordControlCommands, Mode=TwoWay}"/>
+                <CheckBox Content="Include Start Menu apps"
+                          IsChecked="{Binding LauncherIncludeApps, Mode=TwoWay}"/>
+                <CheckBox Content="Include safe system actions"
+                          IsChecked="{Binding LauncherIncludeSystemActions, Mode=TwoWay}"/>
+                <CheckBox Content="Close after action"
+                          IsChecked="{Binding LauncherCloseAfterAction, Mode=TwoWay}"/>
+                <Grid ColumnDefinitions="220,160,*"
+                      ColumnSpacing="12">
+                    <TextBlock Text="Max results"
+                               Foreground="#D8E1EA"
+                               VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1"
+                             Text="{Binding LauncherMaxResults, Mode=TwoWay}"
+                             MinHeight="34"/>
+                    <TextBlock Grid.Column="2"
+                               Text="Clamped between 8 and 20."
+                               Foreground="#8FA1B3"
+                               VerticalAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
         <Grid ColumnDefinitions="Auto,Auto,Auto,*"
               ColumnSpacing="12">
             <Button Content="Save Settings"

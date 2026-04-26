@@ -102,13 +102,21 @@ Branch/commit note: Commit to `dev` unless asked otherwise.
 
 Goal: Build a launcher and command palette for NordControl and app search.
 
+Status: Implemented as a V1 foundation. Command Launcher V1 includes a glass-style overlay, search, keyboard navigation, built-in NordControl commands, module navigation, Customization subsection navigation, widget commands, theme commands, safe system actions, Start Menu shortcut app search, Settings integration, a visible shell Launcher button, and a local `Ctrl+Space` shortcut while NordControl is focused.
+
 Deliverables:
 
-- Global hotkey support
-- App search
-- Command palette
-- NordControl actions
-- Conflict/disable settings
+- Launcher settings model
+- Launcher command catalog and search scoring
+- App-owned launcher overlay window
+- Keyboard navigation with Enter/Escape/Up/Down
+- NordControl navigation and safe action routing
+- Desktop widget commands
+- Theme package commands
+- Start Menu `.lnk` app search and launch
+- Settings integration
+- Local Ctrl+Space shortcut and launcher button
+- Native global hotkey service path documented as planned; no Explorer patching, shell injection, service installation, or shell replacement
 
 Risk level: Medium
 
