@@ -50,6 +50,7 @@ The app currently includes:
 - Windows personalization safe controls for current-user apps/system theme, transparency, and title-bar accent.
 - Preset gallery and desktop environment roadmap cards.
 - Theme package gallery, import/export controls, custom theme editor, and live preview in the Customization Themes subsection.
+- Taskbar Lab V1 in the Customization Taskbar subsection, with read-only current-user taskbar state detection, preview-only taskbar presets, safety toggles, and an app-only live taskbar mockup.
 
 ## Existing Modules
 
@@ -77,6 +78,11 @@ The app currently includes:
 - `NordControl.Core/Models/AppSettings.cs`
 - `NordControl.Core/Models/CustomizationSettings.cs`
 - `NordControl.Core/Models/ThemePackage.cs`
+- `NordControl.Core/Models/TaskbarSettings.cs`
+- `NordControl.Core/Models/TaskbarState.cs`
+- `NordControl.Core/Models/TaskbarPreset.cs`
+- `NordControl.Core/Modules/TaskbarPresetCatalog.cs`
+- `NordControl.Core/Services/ITaskbarService.cs`
 - `NordControl.Core/Modules/ThemePackageCatalog.cs`
 - `NordControl.Core/Services/IThemePackageService.cs`
 - `NordControl.Core/Services/JsonThemePackageService.cs`
@@ -84,6 +90,7 @@ The app currently includes:
 - `NordControl.Core/Modules/CustomizationPresetCatalog.cs`
 - `NordControl.Windows/Services/WindowsWindowManagerService.cs`
 - `NordControl.Windows/Services/WindowsPersonalizationService.cs`
+- `NordControl.Windows/Services/WindowsTaskbarService.cs`
 - `NordControl.Windows/Services/JsonAppSettingsService.cs`
 
 ## Settings
@@ -110,13 +117,21 @@ Current settings include:
 - NordControl accent color
 - Glass-style preview setting
 - Low-risk Windows personalization permission
+- Taskbar Lab settings:
+  - selected taskbar preset key
+  - enable Taskbar Lab
+  - preview-only mode
+  - medium-risk taskbar change permission
+  - warning visibility
+  - last applied time
 
 If settings JSON is invalid, the service preserves the broken file as `settings.broken-*.json` and creates defaults.
 
 ## Current Limitations
 
 - `MainWindowViewModel` and `MainWindow.axaml` now act as shell/navigation host; module behavior lives in page-specific view models and views.
-- Customization taskbar, Start menu, widget, launcher, layout, and Risk Lab sections are planning UI only.
+- Customization Start menu, widget, launcher, layout, and Risk Lab sections are planning UI only.
+- Taskbar Lab V1 is preview-first. It does not replace the real taskbar, hook Explorer, patch Explorer, restart Explorer, or implement real blur/acrylic taskbar effects.
 - Theme package import uses a path textbox rather than a native file picker.
 - System accent color and wallpaper changes are not implemented.
 - No global hotkeys yet.
@@ -130,7 +145,7 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 
 1. Improve app-level dynamic styling beyond the Customization live preview.
 2. Add native file picker support for theme import/export.
-3. Research safe taskbar customization without Explorer patching.
+3. Expand Taskbar Lab only with safe, reversible changes; real taskbar blur/replacement remains future Risk Lab work.
 4. Add Desktop Widgets overlay architecture.
 5. Add Command Launcher and hotkey support.
 6. Add Layout Engine for save/restore and tiling.

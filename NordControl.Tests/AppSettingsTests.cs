@@ -25,6 +25,11 @@ public sealed class AppSettingsTests
         Assert.Equal("#4CC2FF", settings.Customization.NordControlAccentColorHex);
         Assert.True(settings.Customization.EnableGlassStyleInApp);
         Assert.True(settings.Customization.AllowLowRiskWindowsPersonalization);
+        Assert.Equal("fluent-transparent", settings.Customization.Taskbar.SelectedTaskbarPresetKey);
+        Assert.False(settings.Customization.Taskbar.EnableTaskbarLab);
+        Assert.False(settings.Customization.Taskbar.AllowMediumRiskTaskbarChanges);
+        Assert.True(settings.Customization.Taskbar.UsePreviewOnlyMode);
+        Assert.True(settings.Customization.Taskbar.ShowTaskbarWarnings);
     }
 
     [Fact]
@@ -35,6 +40,8 @@ public sealed class AppSettingsTests
         settings.Customization.LastSelectedSectionKey = "not-a-section";
         settings.Customization.NordControlAccentColorHex = "blue-ish";
         settings.Customization.SelectedThemePackageKey = "";
+        settings.Customization.Taskbar.SelectedTaskbarPresetKey = "not-a-taskbar-preset";
+        settings.Customization.Taskbar.AllowMediumRiskTaskbarChanges = true;
 
         settings.Normalize();
 
@@ -42,6 +49,8 @@ public sealed class AppSettingsTests
         Assert.Equal("overview", settings.Customization.LastSelectedSectionKey);
         Assert.Equal("#4CC2FF", settings.Customization.NordControlAccentColorHex);
         Assert.Equal("fluent-dark", settings.Customization.SelectedThemePackageKey);
+        Assert.Equal("fluent-transparent", settings.Customization.Taskbar.SelectedTaskbarPresetKey);
+        Assert.False(settings.Customization.Taskbar.AllowMediumRiskTaskbarChanges);
     }
 
     [Fact]

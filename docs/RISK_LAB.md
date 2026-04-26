@@ -18,6 +18,7 @@ Medium risk:
 - Wallpaper changes
 - Startup entries
 - Layout restoration
+- Future opt-in taskbar setting writes that are reversible and clearly explained
 
 High risk:
 
@@ -39,11 +40,14 @@ High risk:
 - Do not restart Explorer automatically.
 - Require user confirmation before applying risky behavior.
 - Prefer preview-only UI until the implementation is understood.
+- Keep Taskbar Lab V1 app-only except for read-only current-user state detection.
 
 ## Future Experimental Ideas
 
 - Transparent or blurred taskbar
 - Floating taskbar
+- Real taskbar blur/acrylic implementation
+- Taskbar replacement or Explorer-integrated taskbar modules
 - Desktop widgets
 - Launcher
 - Tiling manager
@@ -59,3 +63,9 @@ High risk:
 - No background service installation
 - No forced shell restarts
 - No hidden registry changes
+
+## Taskbar Lab V1 Boundary
+
+Taskbar Lab V1 is implemented as a safe foundation in Customization -> Taskbar. It includes persisted settings, read-only taskbar state detection, preview-only presets, and an app-only visual mockup.
+
+V1 does not patch Explorer, inject into Explorer, install shell hooks, replace the real taskbar, restart Explorer, or implement real taskbar blur/acrylic. Those ideas remain future Risk Lab work and require explicit confirmation, logging, and rollback planning before any implementation.

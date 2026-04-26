@@ -106,3 +106,43 @@ internal sealed class DesignTimeWindowsPersonalizationService : IWindowsPersonal
         return PersonalizationOperationResult.Failed("Design-time wallpaper is preview-only.", "App-only");
     }
 }
+
+internal sealed class DesignTimeTaskbarService : ITaskbarService
+{
+    public TaskbarState GetCurrentState()
+    {
+        return new TaskbarState(
+            true,
+            "Center",
+            "Disabled",
+            "Unknown",
+            "Transparency effects enabled",
+            "Design-time read-only snapshot.",
+            DateTime.Now);
+    }
+
+    public IReadOnlyList<TaskbarPreset> GetPresets()
+    {
+        return NordControl.Core.Modules.TaskbarPresetCatalog.Presets;
+    }
+
+    public TaskbarOperationResult PreviewPreset(string presetKey)
+    {
+        var preset = NordControl.Core.Modules.TaskbarPresetCatalog.GetPresetOrDefault(presetKey);
+        return TaskbarOperationResult.Succeeded($"{preset.Name} loaded in the design-time preview.", preset.RiskLevel);
+    }
+
+    public TaskbarOperationResult ApplyPreset(string presetKey, bool allowMediumRisk)
+    {
+        var preset = NordControl.Core.Modules.TaskbarPresetCatalog.GetPresetOrDefault(presetKey);
+        return TaskbarOperationResult.Failed(
+            $"{preset.Name} is preview-only in Taskbar Lab V1.",
+            preset.RiskLevel,
+            "Design-time service does not change Windows.");
+    }
+
+    public TaskbarOperationResult ResetPreview()
+    {
+        return TaskbarOperationResult.Succeeded("Design-time taskbar preview reset.", "Preview-only");
+    }
+}

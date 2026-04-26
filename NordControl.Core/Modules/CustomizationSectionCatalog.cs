@@ -10,7 +10,7 @@ public static class CustomizationSectionCatalog
     [
         new("overview", "Overview", "Snapshot, safety status, and the desktop environment roadmap.", "Safe Layer", "#4CC2FF"),
         new("themes", "Themes", "NordControl presets and low-risk Windows theme controls.", "Presets", "#8CF5D2"),
-        new("taskbar", "Taskbar", "Planned taskbar concepts without Explorer hooks.", "Coming Soon", "#72D7FF"),
+        new("taskbar", "Taskbar", "Taskbar Lab previews and safe read-only Windows taskbar state.", "Taskbar Lab", "#72D7FF"),
         new("start-menu", "Start Menu", "Launcher and Start menu layout experiments for later stages.", "Planned", "#FFD166"),
         new("desktop-widgets", "Desktop Widgets", "A future widget layer for glanceable desktop modules.", "Planned", "#A78BFA"),
         new("window-effects", "Window Effects", "Visual window effects, overlays, and per-app polish ideas.", "Planned", "#FF8FB3"),

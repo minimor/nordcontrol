@@ -20,6 +20,8 @@ public sealed class CustomizationSettings
 
     public bool AllowLowRiskWindowsPersonalization { get; set; } = true;
 
+    public TaskbarSettings Taskbar { get; set; } = new();
+
     public void Normalize()
     {
         if (!NordControl.Core.Modules.CustomizationSectionCatalog.IsKnownSectionKey(LastSelectedSectionKey))
@@ -44,5 +46,8 @@ public sealed class CustomizationSettings
         {
             NordControlAccentColorHex = "#4CC2FF";
         }
+
+        Taskbar ??= new TaskbarSettings();
+        Taskbar.Normalize();
     }
 }

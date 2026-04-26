@@ -16,24 +16,28 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     private readonly IAppStateService appStateService;
     private readonly IThemePackageService themePackageService;
     private readonly IWindowsPersonalizationService windowsPersonalizationService;
+    private readonly ITaskbarService taskbarService;
     private bool isApplyingSettings;
 
     public CustomizationViewModel()
         : this(
             new AppStateService(new DesignTimeAppSettingsService()),
             new JsonThemePackageService(),
-            new DesignTimeWindowsPersonalizationService())
+            new DesignTimeWindowsPersonalizationService(),
+            new DesignTimeTaskbarService())
     {
     }
 
     public CustomizationViewModel(
         IAppStateService appStateService,
         IThemePackageService themePackageService,
-        IWindowsPersonalizationService windowsPersonalizationService)
+        IWindowsPersonalizationService windowsPersonalizationService,
+        ITaskbarService taskbarService)
     {
         this.appStateService = appStateService;
         this.themePackageService = themePackageService;
         this.windowsPersonalizationService = windowsPersonalizationService;
+        this.taskbarService = taskbarService;
 
         CustomizationPresets = CustomizationPresetCatalog.DefaultPresets
             .Select(preset => new CustomizationPresetViewModel(preset, ApplyCustomizationPreset))
@@ -41,12 +45,16 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         CustomizationSections = CustomizationSectionCatalog.Sections
             .Select(section => new CustomizationSectionViewModel(section, SelectCustomizationSection))
             .ToList();
+        TaskbarPresets = this.taskbarService.GetPresets()
+            .Select(preset => new TaskbarPresetViewModel(preset, PreviewTaskbarPreset, ApplyTaskbarPreset))
+            .ToList();
 
         this.appStateService.SettingsChanged += OnSettingsChanged;
         ResetCustomThemeEditor();
         ReloadThemePackages();
         ApplySettings();
         LoadPersonalizationState();
+        LoadTaskbarState();
     }
 
     public ObservableCollection<ThemePackageViewModel> BuiltInThemePackages { get; } = [];
@@ -56,6 +64,8 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     public IReadOnlyList<CustomizationPresetViewModel> CustomizationPresets { get; }
 
     public IReadOnlyList<CustomizationSectionViewModel> CustomizationSections { get; }
+
+    public IReadOnlyList<TaskbarPresetViewModel> TaskbarPresets { get; }
 
     public ObservableCollection<CustomizationFeatureCardViewModel> CurrentCustomizationFeatureCards { get; } = [];
 
@@ -175,6 +185,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     [NotifyPropertyChangedFor(nameof(CurrentCustomizationSectionBadge))]
     [NotifyPropertyChangedFor(nameof(IsCustomizationOverviewSection))]
     [NotifyPropertyChangedFor(nameof(IsCustomizationThemesSection))]
+    [NotifyPropertyChangedFor(nameof(IsCustomizationTaskbarSection))]
     [NotifyPropertyChangedFor(nameof(IsCustomizationPlanningSection))]
     [NotifyPropertyChangedFor(nameof(IsCustomizationRiskLabSection))]
     private CustomizationSectionViewModel? selectedCustomizationSection;
@@ -187,6 +198,76 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
 
     [ObservableProperty]
     private bool allowLowRiskWindowsPersonalization = true;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TaskbarLabRiskBadge))]
+    private bool enableTaskbarLab;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TaskbarPreviewOnlyStatus))]
+    private bool useTaskbarPreviewOnlyMode = true;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TaskbarLabRiskBadge))]
+    private bool allowMediumRiskTaskbarChanges;
+
+    [ObservableProperty]
+    private bool showTaskbarWarnings = true;
+
+    [ObservableProperty]
+    private string selectedTaskbarPresetKey = TaskbarPresetCatalog.DefaultPresetKey;
+
+    [ObservableProperty]
+    private string selectedTaskbarPresetName = "Fluent Transparent";
+
+    [ObservableProperty]
+    private string taskbarStatusMessage = "Taskbar Lab ready. V1 is preview-only.";
+
+    [ObservableProperty]
+    private string taskbarIsWindowsText = "Unknown";
+
+    [ObservableProperty]
+    private string taskbarAlignment = "Unknown";
+
+    [ObservableProperty]
+    private string taskbarAutoHideStatus = "Unknown";
+
+    [ObservableProperty]
+    private string taskbarSmallButtonsStatus = "Unknown";
+
+    [ObservableProperty]
+    private string taskbarTransparencyMode = "Unknown";
+
+    [ObservableProperty]
+    private string taskbarNotes = "Taskbar snapshot not loaded yet.";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TaskbarLastLoadedText))]
+    private DateTime? taskbarLastLoadedAt;
+
+    [ObservableProperty]
+    private string taskbarPreviewAccentColorHex = "#4CC2FF";
+
+    [ObservableProperty]
+    private string taskbarPreviewDesktopColorHex = "#101418";
+
+    [ObservableProperty]
+    private string taskbarPreviewSurfaceColorHex = "#18202A";
+
+    [ObservableProperty]
+    private string taskbarPreviewRailColorHex = "#223040";
+
+    [ObservableProperty]
+    private string taskbarPreviewIconColorHex = "#D8E1EA";
+
+    [ObservableProperty]
+    private string taskbarPreviewDescription = "A clean translucent taskbar concept with soft Windows-style surfaces.";
+
+    [ObservableProperty]
+    private string taskbarPreviewVisualStyle = "Soft acrylic preview";
+
+    [ObservableProperty]
+    private string taskbarPreviewRiskLevel = "Preview-only";
 
     public string PersonalizationLastLoadedText =>
         PersonalizationLastLoadedAt?.ToString("HH:mm:ss") ?? "Not loaded";
@@ -202,10 +283,12 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
 
     public bool IsCustomizationThemesSection => SelectedCustomizationSection?.Key == "themes";
 
+    public bool IsCustomizationTaskbarSection => SelectedCustomizationSection?.Key == "taskbar";
+
     public bool IsCustomizationRiskLabSection => SelectedCustomizationSection?.IsRiskLab == true;
 
     public bool IsCustomizationPlanningSection =>
-        !IsCustomizationOverviewSection && !IsCustomizationThemesSection;
+        !IsCustomizationOverviewSection && !IsCustomizationThemesSection && !IsCustomizationTaskbarSection;
 
     public string ThemesDirectoryPath => themePackageService.UserThemesDirectory;
 
@@ -216,6 +299,15 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     public bool ShowNoUserThemePackages => !HasUserThemePackages;
 
     public string PreviewGlassText => $"Glass enabled: {PreviewGlassEnabled}";
+
+    public string TaskbarLastLoadedText => TaskbarLastLoadedAt?.ToString("HH:mm:ss") ?? "Not loaded";
+
+    public string TaskbarLabRiskBadge =>
+        EnableTaskbarLab
+            ? AllowMediumRiskTaskbarChanges ? "Medium gated" : "Preview-first"
+            : "Disabled";
+
+    public string TaskbarPreviewOnlyStatus => UseTaskbarPreviewOnlyMode ? "Preview-only mode on" : "Preview-only recommended";
 
     partial void OnSelectedCustomizationSectionChanged(CustomizationSectionViewModel? value)
     {
@@ -233,10 +325,36 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         RefreshCustomizationFeatureCards();
     }
 
+    partial void OnEnableTaskbarLabChanged(bool value)
+    {
+        PersistTaskbarSettings(settings => settings.EnableTaskbarLab = value);
+    }
+
+    partial void OnUseTaskbarPreviewOnlyModeChanged(bool value)
+    {
+        PersistTaskbarSettings(settings => settings.UsePreviewOnlyMode = value);
+    }
+
+    partial void OnAllowMediumRiskTaskbarChangesChanged(bool value)
+    {
+        PersistTaskbarSettings(settings => settings.AllowMediumRiskTaskbarChanges = value);
+    }
+
+    partial void OnShowTaskbarWarningsChanged(bool value)
+    {
+        PersistTaskbarSettings(settings => settings.ShowTaskbarWarnings = value);
+    }
+
     [RelayCommand]
     private void RefreshPersonalization()
     {
         LoadPersonalizationState();
+    }
+
+    [RelayCommand]
+    private void RefreshTaskbarState()
+    {
+        LoadTaskbarState();
     }
 
     [RelayCommand]
@@ -293,6 +411,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     private void ApplySettings()
     {
         var customizationSettings = appStateService.Settings.Customization;
+        var taskbarSettings = customizationSettings.Taskbar;
         isApplyingSettings = true;
 
         SelectedCustomizationPresetKey = customizationSettings.SelectedPresetKey;
@@ -310,9 +429,15 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         NordControlAccentColorHex = customizationSettings.NordControlAccentColorHex;
         EnableGlassStyleInApp = customizationSettings.EnableGlassStyleInApp;
         AllowLowRiskWindowsPersonalization = customizationSettings.AllowLowRiskWindowsPersonalization;
+        EnableTaskbarLab = taskbarSettings.EnableTaskbarLab;
+        UseTaskbarPreviewOnlyMode = taskbarSettings.UsePreviewOnlyMode;
+        AllowMediumRiskTaskbarChanges = taskbarSettings.AllowMediumRiskTaskbarChanges;
+        ShowTaskbarWarnings = taskbarSettings.ShowTaskbarWarnings;
+        SelectedTaskbarPresetKey = taskbarSettings.SelectedTaskbarPresetKey;
 
         isApplyingSettings = false;
         RefreshSelectedThemeState();
+        ApplyTaskbarPresetToPreview(SelectedTaskbarPresetKey);
         RefreshCustomizationFeatureCards();
     }
 
@@ -333,6 +458,26 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             PersonalizationStatusMessage = $"Could not load Windows style: {ex.Message}";
+        }
+    }
+
+    private void LoadTaskbarState()
+    {
+        try
+        {
+            var state = taskbarService.GetCurrentState();
+            TaskbarIsWindowsText = state.IsWindows ? "Windows detected" : "Not Windows";
+            TaskbarAlignment = state.TaskbarAlignment;
+            TaskbarAutoHideStatus = state.AutoHideEnabled;
+            TaskbarSmallButtonsStatus = state.SmallTaskbarButtons;
+            TaskbarTransparencyMode = state.TransparencyMode;
+            TaskbarNotes = state.Notes;
+            TaskbarLastLoadedAt = state.LastLoadedAt;
+            TaskbarStatusMessage = "Taskbar snapshot refreshed.";
+        }
+        catch (Exception ex)
+        {
+            TaskbarStatusMessage = $"Could not load taskbar state: {ex.Message}";
         }
     }
 
@@ -360,6 +505,41 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         return false;
     }
 
+    private void PreviewTaskbarPreset(TaskbarPresetViewModel preset)
+    {
+        SelectedTaskbarPresetKey = preset.Key;
+        ApplyTaskbarPresetToPreview(preset.Key);
+        var result = taskbarService.PreviewPreset(preset.Key);
+        TaskbarStatusMessage = result.Message;
+    }
+
+    private void ApplyTaskbarPreset(TaskbarPresetViewModel preset)
+    {
+        SelectedTaskbarPresetKey = preset.Key;
+        ApplyTaskbarPresetToPreview(preset.Key);
+
+        var result = taskbarService.ApplyPreset(preset.Key, AllowMediumRiskTaskbarChanges);
+        TaskbarStatusMessage = result.Success
+            ? result.Message
+            : $"{result.Message}{(string.IsNullOrWhiteSpace(result.Details) ? string.Empty : $" {result.Details}")}";
+
+        var taskbarSettings = appStateService.Settings.Customization.Taskbar;
+        taskbarSettings.SelectedTaskbarPresetKey = preset.Key;
+        taskbarSettings.LastAppliedAt = DateTime.Now;
+        appStateService.Save();
+    }
+
+    [RelayCommand]
+    private void ResetTaskbarPreview()
+    {
+        var result = taskbarService.ResetPreview();
+        SelectedTaskbarPresetKey = TaskbarPresetCatalog.DefaultPresetKey;
+        ApplyTaskbarPresetToPreview(SelectedTaskbarPresetKey);
+        appStateService.Settings.Customization.Taskbar.SelectedTaskbarPresetKey = SelectedTaskbarPresetKey;
+        appStateService.Save();
+        TaskbarStatusMessage = result.Message;
+    }
+
     private void ApplyCustomizationPreset(CustomizationPresetViewModel preset)
     {
         SelectedCustomizationPresetKey = preset.Key;
@@ -370,6 +550,39 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         appStateService.Settings.Customization.EnableGlassStyleInApp = true;
         appStateService.Save();
         PersonalizationStatusMessage = $"{preset.Name} applied to NordControl preview and saved.";
+    }
+
+    private void ApplyTaskbarPresetToPreview(string presetKey)
+    {
+        var preset = TaskbarPresetCatalog.GetPresetOrDefault(presetKey);
+        SelectedTaskbarPresetKey = preset.Key;
+        SelectedTaskbarPresetName = preset.Name;
+        TaskbarPreviewAccentColorHex = preset.AccentColorHex;
+        TaskbarPreviewDescription = preset.Description;
+        TaskbarPreviewVisualStyle = preset.VisualStyle;
+        TaskbarPreviewRiskLevel = preset.RiskLevel;
+
+        (TaskbarPreviewDesktopColorHex, TaskbarPreviewSurfaceColorHex, TaskbarPreviewRailColorHex, TaskbarPreviewIconColorHex) =
+            preset.Key switch
+            {
+                "glass-floating" => ("#0B1719", "#20333A", "#2C4B51", "#E5FFF9"),
+                "compact-focus" => ("#101316", "#171D23", "#202832", "#E8EDF2"),
+                "productivity-bar" => ("#16140F", "#252217", "#3D341E", "#FFF2C2"),
+                "cyber-neon" => ("#120B1A", "#211229", "#35183F", "#FFD9F6"),
+                "minimal-dark" => ("#0E1116", "#151922", "#1D2430", "#DDE7FF"),
+                _ => ("#101418", "#18202A", "#223040", "#D8E1EA")
+            };
+    }
+
+    private void PersistTaskbarSettings(Action<TaskbarSettings> update)
+    {
+        if (isApplyingSettings)
+        {
+            return;
+        }
+
+        update(appStateService.Settings.Customization.Taskbar);
+        appStateService.Save();
     }
 
     private void PreviewThemePackage(ThemePackageViewModel themePackage)

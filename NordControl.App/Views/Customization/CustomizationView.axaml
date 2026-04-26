@@ -803,6 +803,427 @@
             </ItemsControl>
         </StackPanel>
 
+        <StackPanel Spacing="14"
+                    IsVisible="{Binding IsCustomizationTaskbarSection}">
+            <Border Background="#111821"
+                    BorderBrush="#33506A"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="18">
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="14">
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Taskbar Lab"
+                                   Foreground="#F4F7FA"
+                                   FontSize="22"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="Experimental Windows taskbar styling and layout control"
+                                   Foreground="#AFC2D3"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding TaskbarStatusMessage}"
+                                   Foreground="#8CF5D2"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="8"
+                                HorizontalAlignment="Right">
+                        <Border Background="#223040"
+                                BorderBrush="#435A73"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,7">
+                            <TextBlock Text="{Binding TaskbarLabRiskBadge}"
+                                       Foreground="#B7D7F2"
+                                       FontWeight="SemiBold"/>
+                        </Border>
+                        <Border Background="#16251F"
+                                BorderBrush="#2D705D"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,7">
+                            <TextBlock Text="{Binding TaskbarPreviewOnlyStatus}"
+                                       Foreground="#BEEBDD"
+                                       FontWeight="SemiBold"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,*,*,*,*"
+                  ColumnSpacing="12">
+                <Border Background="#161D24"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="14">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Windows"
+                                   Foreground="#8FA1B3"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TaskbarIsWindowsText}"
+                                   Foreground="#F4F7FA"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1"
+                        Background="#161D24"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="14">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Alignment"
+                                   Foreground="#8FA1B3"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TaskbarAlignment}"
+                                   Foreground="#F4F7FA"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2"
+                        Background="#161D24"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="14">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Auto-hide"
+                                   Foreground="#8FA1B3"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TaskbarAutoHideStatus}"
+                                   Foreground="#F4F7FA"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3"
+                        Background="#161D24"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="14">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Transparency"
+                                   Foreground="#8FA1B3"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TaskbarTransparencyMode}"
+                                   Foreground="#F4F7FA"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="4"
+                        Background="#161D24"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="14">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Last loaded"
+                                   Foreground="#8FA1B3"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TaskbarLastLoadedText}"
+                                   Foreground="#F4F7FA"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="1.1*,1.4*"
+                  ColumnSpacing="14">
+                <Border Background="#161D24"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="18">
+                    <StackPanel Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Safety Controls"
+                                           Foreground="#F4F7FA"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding TaskbarNotes}"
+                                           Foreground="#AFC2D3"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <Button Grid.Column="1"
+                                    Content="Refresh"
+                                    Command="{Binding RefreshTaskbarStateCommand}"/>
+                        </Grid>
+                        <CheckBox Content="Enable Taskbar Lab"
+                                  IsChecked="{Binding EnableTaskbarLab, Mode=TwoWay}"/>
+                        <CheckBox Content="Preview-only mode"
+                                  IsChecked="{Binding UseTaskbarPreviewOnlyMode, Mode=TwoWay}"/>
+                        <CheckBox Content="Allow medium-risk taskbar changes"
+                                  IsChecked="{Binding AllowMediumRiskTaskbarChanges, Mode=TwoWay}"/>
+                        <CheckBox Content="Show taskbar warnings"
+                                  IsChecked="{Binding ShowTaskbarWarnings, Mode=TwoWay}"/>
+                        <Border Background="#1F1A2C"
+                                BorderBrush="#57427A"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12"
+                                IsVisible="{Binding ShowTaskbarWarnings}">
+                            <TextBlock Text="Taskbar Lab V1 does not patch Explorer, hook the shell, replace the real taskbar, restart Explorer, install services, or silently write risky registry values."
+                                       Foreground="#D9C8FF"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1"
+                        Background="{Binding TaskbarPreviewDesktopColorHex}"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="18">
+                    <Grid RowDefinitions="Auto,*,Auto"
+                          MinHeight="278">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Live Taskbar Preview"
+                                           Foreground="{Binding TaskbarPreviewIconColorHex}"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SelectedTaskbarPresetName}"
+                                           Foreground="{Binding TaskbarPreviewAccentColorHex}"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <Border Grid.Column="1"
+                                    Background="{Binding TaskbarPreviewAccentColorHex}"
+                                    Width="42"
+                                    Height="42"
+                                    CornerRadius="8"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1"
+                              Margin="0,18"
+                              RowDefinitions="*,Auto">
+                            <StackPanel Spacing="10"
+                                        VerticalAlignment="Center">
+                                <Border Background="{Binding TaskbarPreviewRailColorHex}"
+                                        Height="12"
+                                        Width="190"
+                                        CornerRadius="6"
+                                        HorizontalAlignment="Left"
+                                        Opacity="0.75"/>
+                                <Border Background="{Binding TaskbarPreviewRailColorHex}"
+                                        Height="12"
+                                        Width="260"
+                                        CornerRadius="6"
+                                        HorizontalAlignment="Left"
+                                        Opacity="0.52"/>
+                            </StackPanel>
+
+                            <Border Grid.Row="1"
+                                    Background="{Binding TaskbarPreviewSurfaceColorHex}"
+                                    BorderBrush="{Binding TaskbarPreviewAccentColorHex}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12"
+                                    Margin="10,0">
+                                <Grid ColumnDefinitions="Auto,*,Auto"
+                                      ColumnSpacing="16">
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="8">
+                                        <Border Background="{Binding TaskbarPreviewAccentColorHex}"
+                                                Width="20"
+                                                Height="20"
+                                                CornerRadius="5"/>
+                                        <Border Background="{Binding TaskbarPreviewIconColorHex}"
+                                                Width="20"
+                                                Height="20"
+                                                CornerRadius="5"
+                                                Opacity="0.85"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1"
+                                                Orientation="Horizontal"
+                                                Spacing="10"
+                                                HorizontalAlignment="Center">
+                                        <Border Background="{Binding TaskbarPreviewIconColorHex}"
+                                                Width="28"
+                                                Height="28"
+                                                CornerRadius="7"
+                                                Opacity="0.85"/>
+                                        <Border Background="{Binding TaskbarPreviewAccentColorHex}"
+                                                Width="36"
+                                                Height="28"
+                                                CornerRadius="7"/>
+                                        <Border Background="{Binding TaskbarPreviewIconColorHex}"
+                                                Width="28"
+                                                Height="28"
+                                                CornerRadius="7"
+                                                Opacity="0.65"/>
+                                        <Border Background="{Binding TaskbarPreviewIconColorHex}"
+                                                Width="28"
+                                                Height="28"
+                                                CornerRadius="7"
+                                                Opacity="0.65"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2"
+                                                Orientation="Horizontal"
+                                                Spacing="7">
+                                        <Border Background="{Binding TaskbarPreviewRailColorHex}"
+                                                Width="34"
+                                                Height="20"
+                                                CornerRadius="6"/>
+                                        <Border Background="{Binding TaskbarPreviewAccentColorHex}"
+                                                Width="20"
+                                                Height="20"
+                                                CornerRadius="6"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <StackPanel Grid.Row="2"
+                                    Spacing="4">
+                            <Grid ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="10">
+                                <TextBlock Text="{Binding TaskbarPreviewVisualStyle}"
+                                           Foreground="{Binding TaskbarPreviewIconColorHex}"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding TaskbarPreviewRiskLevel}"
+                                           Foreground="#FFD166"/>
+                            </Grid>
+                            <TextBlock Text="{Binding TaskbarPreviewDescription}"
+                                       Foreground="#AFC2D3"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="10">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Taskbar Preset Gallery"
+                                   Foreground="#F4F7FA"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="Preview-only style packages for future safe taskbar work."
+                                   Foreground="#AFC2D3"/>
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="Reset Preview"
+                            Command="{Binding ResetTaskbarPreviewCommand}"/>
+                </Grid>
+                <ItemsControl ItemsSource="{Binding TaskbarPresets}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TaskbarPresetViewModel">
+                            <Border Width="300"
+                                    MinHeight="258"
+                                    Margin="0,0,14,14"
+                                    Background="#151D27"
+                                    BorderBrush="#304459"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="0">
+                                <Grid RowDefinitions="10,*">
+                                    <Border Background="{Binding AccentColorHex}"
+                                            CornerRadius="8,8,0,0"/>
+                                    <StackPanel Grid.Row="1"
+                                                Spacing="10"
+                                                Margin="16">
+                                        <Grid ColumnDefinitions="*,40"
+                                              ColumnSpacing="10">
+                                            <TextBlock Text="{Binding Name}"
+                                                       Foreground="#F4F7FA"
+                                                       FontSize="18"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap"/>
+                                            <Border Grid.Column="1"
+                                                    Background="{Binding AccentColorHex}"
+                                                    Width="34"
+                                                    Height="34"
+                                                    CornerRadius="8"/>
+                                        </Grid>
+                                        <TextBlock Text="{Binding Description}"
+                                                   Foreground="#AFC2D3"
+                                                   TextWrapping="Wrap"
+                                                   MinHeight="58"/>
+                                        <TextBlock Text="{Binding VisualStyle}"
+                                                   Foreground="#8CF5D2"
+                                                   FontWeight="SemiBold"/>
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="8">
+                                            <StackPanel Spacing="5">
+                                                <TextBlock Text="{Binding RiskLevel}"
+                                                           Foreground="#FFD166"
+                                                           FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding RestartBadge}"
+                                                           Foreground="#8FA1B3"
+                                                           FontSize="12"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1"
+                                                    Background="#223040"
+                                                    BorderBrush="{Binding AccentColorHex}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="9,5"
+                                                    VerticalAlignment="Top">
+                                                <TextBlock Text="{Binding ModeBadge}"
+                                                           Foreground="#F4F7FA"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="*,*"
+                                              ColumnSpacing="8">
+                                            <Button Content="Preview"
+                                                    Command="{Binding PreviewCommand}"/>
+                                            <Button Grid.Column="1"
+                                                    Content="Apply"
+                                                    Command="{Binding ApplyCommand}"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <Border Background="#16251F"
+                    BorderBrush="#2D705D"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="18">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Risk Lab Boundary"
+                               Foreground="#F4F7FA"
+                               FontSize="18"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="Real taskbar blur, replacement, Explorer hooks, and shell-level taskbar modules remain future Risk Lab work with explicit confirmation, logging, and rollback planning."
+                               Foreground="#BEEBDD"
+                               TextWrapping="Wrap"/>
+                    <TextBlock Text="Taskbar Lab V1 is app-only preview plus read-only current-user taskbar detection."
+                               Foreground="#8FA1B3"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
         <StackPanel Spacing="12"
                     IsVisible="{Binding IsCustomizationOverviewSection}">
             <TextBlock Text="Desktop Environment Roadmap"

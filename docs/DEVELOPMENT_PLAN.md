@@ -58,13 +58,17 @@ Branch/commit note: Commit to `dev` unless asked otherwise.
 
 Goal: Research safe taskbar customization without shell patching.
 
+Status: Implemented as a preview-first foundation. Taskbar Lab V1 now lives inside Customization -> Taskbar with persisted taskbar settings, a service abstraction, a Windows read-only taskbar snapshot service, preview-only presets, safety toggles, and an app-only live taskbar mockup.
+
 Deliverables:
 
-- Safe taskbar transparency research
-- Preview-only controls
-- Optional low-risk registry/API experiments
-- Explicit risk labels
-- No Explorer restart
+- Taskbar settings model
+- Taskbar service abstraction
+- Safe/read-only taskbar state detection for known current-user values
+- Preview-only taskbar presets
+- Explicit risk labels and safety toggles
+- Live app-only taskbar preview
+- No Explorer restart, hooks, injection, replacement, services, or shell patching
 
 Risk level: Medium
 
