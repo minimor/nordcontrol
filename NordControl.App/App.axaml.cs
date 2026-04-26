@@ -36,6 +36,10 @@ public partial class App : Application
             {
                 DataContext = serviceProvider.GetRequiredService<MainWindowViewModel>(),
             };
+
+            var desktopWidgetService = serviceProvider.GetRequiredService<DesktopWidgetService>();
+            desktopWidgetService.ShowStartupWidgetsIfEnabled();
+            desktop.Exit += (_, _) => desktopWidgetService.HideWidgets();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -49,6 +53,8 @@ public partial class App : Application
         services.AddSingleton<IWindowManagerService, WindowsWindowManagerService>();
         services.AddSingleton<IWindowsPersonalizationService, WindowsPersonalizationService>();
         services.AddSingleton<ITaskbarService, WindowsTaskbarService>();
+        services.AddSingleton<DesktopWidgetService>();
+        services.AddSingleton<IDesktopWidgetService>(provider => provider.GetRequiredService<DesktopWidgetService>());
         services.AddSingleton<IThemePackageService, JsonThemePackageService>();
         services.AddSingleton<IAppStateService, AppStateService>();
         services.AddSingleton<WindowManagerViewModel>();

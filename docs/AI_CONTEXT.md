@@ -51,6 +51,7 @@ The app currently includes:
 - Preset gallery and desktop environment roadmap cards.
 - Theme package gallery, import/export controls, custom theme editor, and live preview in the Customization Themes subsection.
 - Taskbar Lab V1 in the Customization Taskbar subsection, with read-only current-user taskbar state detection, preview-only taskbar presets, safety toggles, and an app-only live taskbar mockup.
+- Desktop Widgets Overlay V1 in the Customization Desktop Widgets subsection, with persisted widget settings, an app-owned Avalonia overlay window controller, Clock and System Monitor Lite overlay widgets, planned widget definitions, and a live preview.
 
 ## Existing Modules
 
@@ -81,8 +82,13 @@ The app currently includes:
 - `NordControl.Core/Models/TaskbarSettings.cs`
 - `NordControl.Core/Models/TaskbarState.cs`
 - `NordControl.Core/Models/TaskbarPreset.cs`
+- `NordControl.Core/Models/DesktopWidgetSettings.cs`
+- `NordControl.Core/Models/DesktopWidgetInstanceSettings.cs`
+- `NordControl.Core/Models/DesktopWidgetDefinition.cs`
 - `NordControl.Core/Modules/TaskbarPresetCatalog.cs`
+- `NordControl.Core/Modules/DesktopWidgetCatalog.cs`
 - `NordControl.Core/Services/ITaskbarService.cs`
+- `NordControl.Core/Services/IDesktopWidgetService.cs`
 - `NordControl.Core/Modules/ThemePackageCatalog.cs`
 - `NordControl.Core/Services/IThemePackageService.cs`
 - `NordControl.Core/Services/JsonThemePackageService.cs`
@@ -92,6 +98,10 @@ The app currently includes:
 - `NordControl.Windows/Services/WindowsPersonalizationService.cs`
 - `NordControl.Windows/Services/WindowsTaskbarService.cs`
 - `NordControl.Windows/Services/JsonAppSettingsService.cs`
+- `NordControl.App/Services/DesktopWidgetService.cs`
+- `NordControl.App/Views/Widgets/DesktopWidgetWindow.axaml`
+- `NordControl.App/Views/Widgets/ClockWidgetView.axaml`
+- `NordControl.App/Views/Widgets/SystemMonitorLiteWidgetView.axaml`
 
 ## Settings
 
@@ -124,14 +134,23 @@ Current settings include:
   - medium-risk taskbar change permission
   - warning visibility
   - last applied time
+- Desktop Widget settings:
+  - enable widgets
+  - start widgets with app
+  - lock widget positions
+  - show widget background
+  - global opacity
+  - selected widget theme key
+  - widget instance positions, sizes, enabled state, opacity, and always-on-top preference
 
 If settings JSON is invalid, the service preserves the broken file as `settings.broken-*.json` and creates defaults.
 
 ## Current Limitations
 
 - `MainWindowViewModel` and `MainWindow.axaml` now act as shell/navigation host; module behavior lives in page-specific view models and views.
-- Customization Start menu, widget, launcher, layout, and Risk Lab sections are planning UI only.
+- Customization Start menu, launcher, layout, and Risk Lab sections are planning UI only.
 - Taskbar Lab V1 is preview-first. It does not replace the real taskbar, hook Explorer, patch Explorer, restart Explorer, or implement real blur/acrylic taskbar effects.
+- Desktop Widgets Overlay V1 uses app-owned Avalonia windows only. It does not replace the desktop, integrate with Explorer, install services, or use global hooks. Widget dragging/position capture and real system-wide metrics are future work.
 - Theme package import uses a path textbox rather than a native file picker.
 - System accent color and wallpaper changes are not implemented.
 - No global hotkeys yet.
@@ -146,7 +165,7 @@ If settings JSON is invalid, the service preserves the broken file as `settings.
 1. Improve app-level dynamic styling beyond the Customization live preview.
 2. Add native file picker support for theme import/export.
 3. Expand Taskbar Lab only with safe, reversible changes; real taskbar blur/replacement remains future Risk Lab work.
-4. Add Desktop Widgets overlay architecture.
+4. Improve Desktop Widgets with optional dragging/position save and lightweight real metrics.
 5. Add Command Launcher and hotkey support.
 6. Add Layout Engine for save/restore and tiling.
 7. Keep Risk Lab isolated and explicit.

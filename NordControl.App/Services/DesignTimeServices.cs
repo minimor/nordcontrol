@@ -146,3 +146,47 @@ internal sealed class DesignTimeTaskbarService : ITaskbarService
         return TaskbarOperationResult.Succeeded("Design-time taskbar preview reset.", "Preview-only");
     }
 }
+
+internal sealed class DesignTimeDesktopWidgetService : IDesktopWidgetService
+{
+    private DesktopWidgetSettings settings = new();
+
+    public IReadOnlyList<DesktopWidgetDefinition> GetDefinitions()
+    {
+        return NordControl.Core.Modules.DesktopWidgetCatalog.Definitions;
+    }
+
+    public DesktopWidgetSettings LoadSettings(AppSettings settings)
+    {
+        settings.Normalize();
+        return settings.Customization.DesktopWidgets;
+    }
+
+    public WidgetOperationResult SaveSettings(DesktopWidgetSettings settings)
+    {
+        settings.Normalize();
+        this.settings = settings;
+        return WidgetOperationResult.Succeeded("Design-time widget settings saved.");
+    }
+
+    public WidgetOperationResult ShowWidgets()
+    {
+        return WidgetOperationResult.Succeeded("Design-time widget windows shown.");
+    }
+
+    public WidgetOperationResult HideWidgets()
+    {
+        return WidgetOperationResult.Succeeded("Design-time widget windows hidden.");
+    }
+
+    public WidgetOperationResult ToggleWidgets()
+    {
+        return settings.EnableWidgets ? HideWidgets() : ShowWidgets();
+    }
+
+    public WidgetOperationResult ResetWidgetLayout()
+    {
+        settings.Widgets = NordControl.Core.Modules.DesktopWidgetCatalog.CreateDefaultWidgetInstances();
+        return WidgetOperationResult.Succeeded("Design-time widget layout reset.");
+    }
+}

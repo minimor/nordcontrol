@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:widgets="using:NordControl.App.Views.Widgets"
+        xmlns:vm="using:NordControl.App.ViewModels.Widgets"
+        x:Class="NordControl.App.Views.Widgets.DesktopWidgetWindow"
+        x:DataType="vm:DesktopWidgetWindowViewModel"
+        Title="{Binding WidgetName}"
+        WindowDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="AcrylicBlur,Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        ShowInTaskbar="False"
+        CanResize="False">
+    <Border Background="{Binding WidgetBackgroundColor}"
+            BorderBrush="{Binding AccentColorHex}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="16"
+            Opacity="{Binding EffectiveOpacity}">
+        <Grid>
+            <widgets:ClockWidgetView IsVisible="{Binding IsClockWidget}"/>
+            <widgets:SystemMonitorLiteWidgetView IsVisible="{Binding IsSystemMonitorLiteWidget}"/>
+        </Grid>
+    </Border>
+</Window>

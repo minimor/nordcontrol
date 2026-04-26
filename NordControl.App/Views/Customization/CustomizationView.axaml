@@ -1224,6 +1224,338 @@
             </Border>
         </StackPanel>
 
+        <StackPanel Spacing="14"
+                    IsVisible="{Binding IsCustomizationDesktopWidgetsSection}">
+            <Border Background="#111821"
+                    BorderBrush="#4C3F73"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="18">
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="14">
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Desktop Widgets"
+                                   Foreground="#F4F7FA"
+                                   FontSize="22"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="Lightweight overlay modules for desktop workflow"
+                                   Foreground="#AFC2D3"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding DesktopWidgetStatusMessage}"
+                                   Foreground="#8CF5D2"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="8"
+                                HorizontalAlignment="Right">
+                        <Border Background="#223040"
+                                BorderBrush="#435A73"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,7">
+                            <TextBlock Text="{Binding DesktopWidgetsStatusBadge}"
+                                       Foreground="#B7D7F2"
+                                       FontWeight="SemiBold"/>
+                        </Border>
+                        <Border Background="#1F1A2C"
+                                BorderBrush="#57427A"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,7">
+                            <TextBlock Text="Low / Medium"
+                                       Foreground="#D9C8FF"
+                                       FontWeight="SemiBold"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="1.05*,1.35*"
+                  ColumnSpacing="14">
+                <Border Background="#161D24"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="18">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Global Controls"
+                                   Foreground="#F4F7FA"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"/>
+                        <CheckBox Content="Enable Widgets"
+                                  IsChecked="{Binding EnableDesktopWidgets, Mode=TwoWay}"/>
+                        <CheckBox Content="Start Widgets With App"
+                                  IsChecked="{Binding StartWidgetsWithApp, Mode=TwoWay}"/>
+                        <CheckBox Content="Lock Widget Positions"
+                                  IsChecked="{Binding LockWidgetPositions, Mode=TwoWay}"/>
+                        <CheckBox Content="Show Widget Background"
+                                  IsChecked="{Binding ShowWidgetBackground, Mode=TwoWay}"/>
+                        <StackPanel Spacing="6">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Global Opacity"
+                                           Foreground="#D8E1EA"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding DesktopWidgetGlobalOpacity}"
+                                           Foreground="#8CF5D2"/>
+                            </Grid>
+                            <Slider Minimum="0.2"
+                                    Maximum="1"
+                                    TickFrequency="0.05"
+                                    Value="{Binding DesktopWidgetGlobalOpacity, Mode=TwoWay}"/>
+                        </StackPanel>
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Selected Widget Theme"
+                                       Foreground="#D8E1EA"
+                                       FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding SelectedWidgetThemeKey, Mode=TwoWay}"/>
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,*,*"
+                              ColumnSpacing="8">
+                            <Button Content="Show Widgets"
+                                    Command="{Binding ShowDesktopWidgetsCommand}"/>
+                            <Button Grid.Column="1"
+                                    Content="Hide Widgets"
+                                    Command="{Binding HideDesktopWidgetsCommand}"/>
+                            <Button Grid.Column="2"
+                                    Content="Reset Layout"
+                                    Command="{Binding ResetDesktopWidgetLayoutCommand}"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1"
+                        Background="#101418"
+                        BorderBrush="#2C3C4E"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="18">
+                    <Grid RowDefinitions="Auto,*"
+                          MinHeight="330">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Live Preview"
+                                           Foreground="#F4F7FA"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="App-only widget overlay mockup"
+                                           Foreground="#AFC2D3"/>
+                            </StackPanel>
+                            <Border Grid.Column="1"
+                                    Background="{Binding DesktopWidgetPreviewAccentHex}"
+                                    Width="42"
+                                    Height="42"
+                                    CornerRadius="8"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1"
+                              Margin="0,16,0,0"
+                              Background="#0E1218"
+                              RowDefinitions="*,Auto"
+                              ClipToBounds="True">
+                            <StackPanel Margin="18"
+                                        Spacing="10">
+                                <Border Height="12"
+                                        Width="180"
+                                        Background="#223040"
+                                        CornerRadius="6"
+                                        HorizontalAlignment="Left"/>
+                                <Border Height="12"
+                                        Width="260"
+                                        Background="#223040"
+                                        CornerRadius="6"
+                                        Opacity="0.55"
+                                        HorizontalAlignment="Left"/>
+                            </StackPanel>
+
+                            <Grid Margin="28,58,28,34"
+                                  ColumnDefinitions="*,*"
+                                  RowDefinitions="Auto,Auto"
+                                  ColumnSpacing="14"
+                                  RowSpacing="14"
+                                  Opacity="{Binding DesktopWidgetPreviewOpacity}">
+                                <Border Background="{Binding DesktopWidgetPreviewBackgroundHex}"
+                                        BorderBrush="#4CC2FF"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="14">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="Clock"
+                                                   Foreground="#8FA1B3"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="14:32:08"
+                                                   Foreground="#F4F7FA"
+                                                   FontSize="28"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="Desktop overlay card"
+                                                   Foreground="#AFC2D3"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1"
+                                        Background="{Binding DesktopWidgetPreviewBackgroundHex}"
+                                        BorderBrush="#8CF5D2"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="14">
+                                    <StackPanel Spacing="7">
+                                        <TextBlock Text="System Monitor"
+                                                   Foreground="#8FA1B3"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="CPU: placeholder"
+                                                   Foreground="#F4F7FA"
+                                                   FontSize="18"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="Memory: prepared"
+                                                   Foreground="#AFC2D3"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Row="1"
+                                        Background="{Binding DesktopWidgetPreviewBackgroundHex}"
+                                        BorderBrush="#A78BFA"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="14"
+                                        Opacity="0.72">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="Music"
+                                                   Foreground="#8FA1B3"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="Planned"
+                                                   Foreground="#D8E1EA"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Row="1"
+                                        Grid.Column="1"
+                                        Background="{Binding DesktopWidgetPreviewBackgroundHex}"
+                                        BorderBrush="#FFD166"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="14"
+                                        Opacity="0.72">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="Notes"
+                                                   Foreground="#8FA1B3"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="Planned"
+                                                   Foreground="#D8E1EA"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <StackPanel Spacing="12">
+                <TextBlock Text="Widget Gallery"
+                           Foreground="#F4F7FA"
+                           FontSize="20"
+                           FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding DesktopWidgetDefinitions}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DesktopWidgetDefinitionViewModel">
+                            <Border Width="292"
+                                    MinHeight="242"
+                                    Margin="0,0,14,14"
+                                    Background="#151D27"
+                                    BorderBrush="#304459"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="0">
+                                <Grid RowDefinitions="10,*">
+                                    <Border Background="{Binding AccentColorHex}"
+                                            CornerRadius="8,8,0,0"/>
+                                    <StackPanel Grid.Row="1"
+                                                Spacing="10"
+                                                Margin="16">
+                                        <Grid ColumnDefinitions="*,38"
+                                              ColumnSpacing="10">
+                                            <TextBlock Text="{Binding Name}"
+                                                       Foreground="#F4F7FA"
+                                                       FontSize="18"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap"/>
+                                            <Border Grid.Column="1"
+                                                    Background="{Binding AccentColorHex}"
+                                                    Width="32"
+                                                    Height="32"
+                                                    CornerRadius="8"/>
+                                        </Grid>
+                                        <TextBlock Text="{Binding Description}"
+                                                   Foreground="#AFC2D3"
+                                                   TextWrapping="Wrap"
+                                                   MinHeight="58"/>
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Spacing="5">
+                                                <TextBlock Text="{Binding Category}"
+                                                           Foreground="#8CF5D2"
+                                                           FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding RiskLevel}"
+                                                           Foreground="#FFD166"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1"
+                                                    Background="#223040"
+                                                    BorderBrush="{Binding AccentColorHex}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="9,5"
+                                                    VerticalAlignment="Top">
+                                                <TextBlock Text="{Binding ImplementationBadge}"
+                                                           Foreground="#F4F7FA"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="10">
+                                            <CheckBox Content="Enabled"
+                                                      IsEnabled="{Binding IsImplemented}"
+                                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                      VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1"
+                                                    Content="Show"
+                                                    IsEnabled="{Binding IsImplemented}"
+                                                    Command="{Binding ShowCommand}"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <Border Background="#16251F"
+                    BorderBrush="#2D705D"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="18">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Safety Note"
+                               Foreground="#F4F7FA"
+                               FontSize="18"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="Widgets are NordControl-owned Avalonia overlay windows. They do not patch Explorer, inject into the shell, replace the desktop, install services, or use global hooks."
+                               Foreground="#BEEBDD"
+                               TextWrapping="Wrap"/>
+                    <TextBlock Text="Use Hide Widgets from NordControl or close the widget windows normally."
+                               Foreground="#8FA1B3"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
         <StackPanel Spacing="12"
                     IsVisible="{Binding IsCustomizationOverviewSection}">
             <TextBlock Text="Desktop Environment Roadmap"

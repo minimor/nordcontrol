@@ -30,6 +30,13 @@ public sealed class AppSettingsTests
         Assert.False(settings.Customization.Taskbar.AllowMediumRiskTaskbarChanges);
         Assert.True(settings.Customization.Taskbar.UsePreviewOnlyMode);
         Assert.True(settings.Customization.Taskbar.ShowTaskbarWarnings);
+        Assert.False(settings.Customization.DesktopWidgets.EnableWidgets);
+        Assert.False(settings.Customization.DesktopWidgets.StartWidgetsWithApp);
+        Assert.False(settings.Customization.DesktopWidgets.LockWidgetPositions);
+        Assert.True(settings.Customization.DesktopWidgets.ShowWidgetBackground);
+        Assert.Equal(0.92, settings.Customization.DesktopWidgets.GlobalOpacity);
+        Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "clock");
+        Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "system-monitor-lite");
     }
 
     [Fact]
@@ -42,6 +49,16 @@ public sealed class AppSettingsTests
         settings.Customization.SelectedThemePackageKey = "";
         settings.Customization.Taskbar.SelectedTaskbarPresetKey = "not-a-taskbar-preset";
         settings.Customization.Taskbar.AllowMediumRiskTaskbarChanges = true;
+        settings.Customization.DesktopWidgets.GlobalOpacity = -1;
+        settings.Customization.DesktopWidgets.Widgets =
+        [
+            new DesktopWidgetInstanceSettings
+            {
+                Id = "unknown",
+                WidgetType = "unknown-widget",
+                IsEnabled = true
+            }
+        ];
 
         settings.Normalize();
 
@@ -51,6 +68,10 @@ public sealed class AppSettingsTests
         Assert.Equal("fluent-dark", settings.Customization.SelectedThemePackageKey);
         Assert.Equal("fluent-transparent", settings.Customization.Taskbar.SelectedTaskbarPresetKey);
         Assert.False(settings.Customization.Taskbar.AllowMediumRiskTaskbarChanges);
+        Assert.Equal(0.2, settings.Customization.DesktopWidgets.GlobalOpacity);
+        Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "clock");
+        Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "system-monitor-lite");
+        Assert.Contains(settings.Customization.DesktopWidgets.Widgets, widget => widget.WidgetType == "unknown-widget" && !widget.IsEnabled);
     }
 
     [Fact]

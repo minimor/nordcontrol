@@ -12,7 +12,7 @@ public static class CustomizationSectionCatalog
         new("themes", "Themes", "NordControl presets and low-risk Windows theme controls.", "Presets", "#8CF5D2"),
         new("taskbar", "Taskbar", "Taskbar Lab previews and safe read-only Windows taskbar state.", "Taskbar Lab", "#72D7FF"),
         new("start-menu", "Start Menu", "Launcher and Start menu layout experiments for later stages.", "Planned", "#FFD166"),
-        new("desktop-widgets", "Desktop Widgets", "A future widget layer for glanceable desktop modules.", "Planned", "#A78BFA"),
+        new("desktop-widgets", "Desktop Widgets", "App-owned overlay widgets for glanceable desktop modules.", "Safe Overlay", "#A78BFA"),
         new("window-effects", "Window Effects", "Visual window effects, overlays, and per-app polish ideas.", "Planned", "#FF8FB3"),
         new("launcher", "Launcher", "A command-first launcher inspired by fast desktop workflows.", "Command Lab", "#FF4FD8"),
         new("layouts-tiling", "Layouts / Tiling", "Window layout, zones, and workspace concepts.", "Layout Lab", "#8FB7FF"),

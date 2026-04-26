@@ -22,6 +22,8 @@ public sealed class CustomizationSettings
 
     public TaskbarSettings Taskbar { get; set; } = new();
 
+    public DesktopWidgetSettings DesktopWidgets { get; set; } = new();
+
     public void Normalize()
     {
         if (!NordControl.Core.Modules.CustomizationSectionCatalog.IsKnownSectionKey(LastSelectedSectionKey))
@@ -49,5 +51,8 @@ public sealed class CustomizationSettings
 
         Taskbar ??= new TaskbarSettings();
         Taskbar.Normalize();
+
+        DesktopWidgets ??= new DesktopWidgetSettings();
+        DesktopWidgets.Normalize();
     }
 }

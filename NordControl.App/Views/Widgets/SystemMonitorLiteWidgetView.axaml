@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NordControl.App.ViewModels.Widgets"
+             x:Class="NordControl.App.Views.Widgets.SystemMonitorLiteWidgetView"
+             x:DataType="vm:DesktopWidgetWindowViewModel">
+    <StackPanel Spacing="10">
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="System Monitor Lite"
+                       Foreground="#8FA1B3"
+                       FontSize="12"
+                       FontWeight="SemiBold"/>
+            <Border Grid.Column="1"
+                    Background="{Binding AccentColorHex}"
+                    Width="26"
+                    Height="8"
+                    CornerRadius="4"/>
+        </Grid>
+        <TextBlock Text="{Binding CpuText}"
+                   Foreground="#F4F7FA"
+                   FontSize="20"
+                   FontWeight="SemiBold"/>
+        <TextBlock Text="{Binding MemoryText}"
+                   Foreground="#D8E1EA"
+                   FontSize="17"
+                   FontWeight="SemiBold"/>
+        <TextBlock Text="{Binding MonitorNote}"
+                   Foreground="#AFC2D3"
+                   TextWrapping="Wrap"/>
+    </StackPanel>
+</UserControl>

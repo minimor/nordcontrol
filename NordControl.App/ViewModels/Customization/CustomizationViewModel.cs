@@ -17,6 +17,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     private readonly IThemePackageService themePackageService;
     private readonly IWindowsPersonalizationService windowsPersonalizationService;
     private readonly ITaskbarService taskbarService;
+    private readonly IDesktopWidgetService desktopWidgetService;
     private bool isApplyingSettings;
 
     public CustomizationViewModel()
@@ -24,7 +25,8 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
             new AppStateService(new DesignTimeAppSettingsService()),
             new JsonThemePackageService(),
             new DesignTimeWindowsPersonalizationService(),
-            new DesignTimeTaskbarService())
+            new DesignTimeTaskbarService(),
+            new DesignTimeDesktopWidgetService())
     {
     }
 
@@ -32,12 +34,14 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         IAppStateService appStateService,
         IThemePackageService themePackageService,
         IWindowsPersonalizationService windowsPersonalizationService,
-        ITaskbarService taskbarService)
+        ITaskbarService taskbarService,
+        IDesktopWidgetService desktopWidgetService)
     {
         this.appStateService = appStateService;
         this.themePackageService = themePackageService;
         this.windowsPersonalizationService = windowsPersonalizationService;
         this.taskbarService = taskbarService;
+        this.desktopWidgetService = desktopWidgetService;
 
         CustomizationPresets = CustomizationPresetCatalog.DefaultPresets
             .Select(preset => new CustomizationPresetViewModel(preset, ApplyCustomizationPreset))
@@ -47,6 +51,13 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
             .ToList();
         TaskbarPresets = this.taskbarService.GetPresets()
             .Select(preset => new TaskbarPresetViewModel(preset, PreviewTaskbarPreset, ApplyTaskbarPreset))
+            .ToList();
+        DesktopWidgetDefinitions = this.desktopWidgetService.GetDefinitions()
+            .Select(definition => new DesktopWidgetDefinitionViewModel(
+                definition,
+                isEnabled: false,
+                SetDesktopWidgetEnabled,
+                ShowDesktopWidget))
             .ToList();
 
         this.appStateService.SettingsChanged += OnSettingsChanged;
@@ -66,6 +77,8 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     public IReadOnlyList<CustomizationSectionViewModel> CustomizationSections { get; }
 
     public IReadOnlyList<TaskbarPresetViewModel> TaskbarPresets { get; }
+
+    public IReadOnlyList<DesktopWidgetDefinitionViewModel> DesktopWidgetDefinitions { get; }
 
     public ObservableCollection<CustomizationFeatureCardViewModel> CurrentCustomizationFeatureCards { get; } = [];
 
@@ -186,6 +199,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     [NotifyPropertyChangedFor(nameof(IsCustomizationOverviewSection))]
     [NotifyPropertyChangedFor(nameof(IsCustomizationThemesSection))]
     [NotifyPropertyChangedFor(nameof(IsCustomizationTaskbarSection))]
+    [NotifyPropertyChangedFor(nameof(IsCustomizationDesktopWidgetsSection))]
     [NotifyPropertyChangedFor(nameof(IsCustomizationPlanningSection))]
     [NotifyPropertyChangedFor(nameof(IsCustomizationRiskLabSection))]
     private CustomizationSectionViewModel? selectedCustomizationSection;
@@ -269,6 +283,35 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private string taskbarPreviewRiskLevel = "Preview-only";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DesktopWidgetsStatusBadge))]
+    private bool enableDesktopWidgets;
+
+    [ObservableProperty]
+    private bool startWidgetsWithApp;
+
+    [ObservableProperty]
+    private bool lockWidgetPositions;
+
+    [ObservableProperty]
+    private bool showWidgetBackground = true;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DesktopWidgetPreviewOpacity))]
+    private double desktopWidgetGlobalOpacity = 0.92;
+
+    [ObservableProperty]
+    private string selectedWidgetThemeKey = DesktopWidgetCatalog.DefaultWidgetThemeKey;
+
+    [ObservableProperty]
+    private string desktopWidgetStatusMessage = "Desktop Widgets ready. Overlay windows are app-owned.";
+
+    [ObservableProperty]
+    private string desktopWidgetPreviewBackgroundHex = "#18202A";
+
+    [ObservableProperty]
+    private string desktopWidgetPreviewAccentHex = "#A78BFA";
+
     public string PersonalizationLastLoadedText =>
         PersonalizationLastLoadedAt?.ToString("HH:mm:ss") ?? "Not loaded";
 
@@ -285,10 +328,15 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
 
     public bool IsCustomizationTaskbarSection => SelectedCustomizationSection?.Key == "taskbar";
 
+    public bool IsCustomizationDesktopWidgetsSection => SelectedCustomizationSection?.Key == "desktop-widgets";
+
     public bool IsCustomizationRiskLabSection => SelectedCustomizationSection?.IsRiskLab == true;
 
     public bool IsCustomizationPlanningSection =>
-        !IsCustomizationOverviewSection && !IsCustomizationThemesSection && !IsCustomizationTaskbarSection;
+        !IsCustomizationOverviewSection &&
+        !IsCustomizationThemesSection &&
+        !IsCustomizationTaskbarSection &&
+        !IsCustomizationDesktopWidgetsSection;
 
     public string ThemesDirectoryPath => themePackageService.UserThemesDirectory;
 
@@ -308,6 +356,10 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
             : "Disabled";
 
     public string TaskbarPreviewOnlyStatus => UseTaskbarPreviewOnlyMode ? "Preview-only mode on" : "Preview-only recommended";
+
+    public string DesktopWidgetsStatusBadge => EnableDesktopWidgets ? "Safe Overlay On" : "Safe Overlay Off";
+
+    public double DesktopWidgetPreviewOpacity => Math.Clamp(DesktopWidgetGlobalOpacity, 0.2, 1.0);
 
     partial void OnSelectedCustomizationSectionChanged(CustomizationSectionViewModel? value)
     {
@@ -345,6 +397,37 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         PersistTaskbarSettings(settings => settings.ShowTaskbarWarnings = value);
     }
 
+    partial void OnEnableDesktopWidgetsChanged(bool value)
+    {
+        PersistDesktopWidgetSettings(settings => settings.EnableWidgets = value);
+    }
+
+    partial void OnStartWidgetsWithAppChanged(bool value)
+    {
+        PersistDesktopWidgetSettings(settings => settings.StartWidgetsWithApp = value);
+    }
+
+    partial void OnLockWidgetPositionsChanged(bool value)
+    {
+        PersistDesktopWidgetSettings(settings => settings.LockWidgetPositions = value);
+    }
+
+    partial void OnShowWidgetBackgroundChanged(bool value)
+    {
+        DesktopWidgetPreviewBackgroundHex = value ? "#18202A" : "#101418";
+        PersistDesktopWidgetSettings(settings => settings.ShowWidgetBackground = value);
+    }
+
+    partial void OnDesktopWidgetGlobalOpacityChanged(double value)
+    {
+        PersistDesktopWidgetSettings(settings => settings.GlobalOpacity = value);
+    }
+
+    partial void OnSelectedWidgetThemeKeyChanged(string value)
+    {
+        PersistDesktopWidgetSettings(settings => settings.SelectedWidgetThemeKey = value);
+    }
+
     [RelayCommand]
     private void RefreshPersonalization()
     {
@@ -355,6 +438,28 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     private void RefreshTaskbarState()
     {
         LoadTaskbarState();
+    }
+
+    [RelayCommand]
+    private void ShowDesktopWidgets()
+    {
+        var result = desktopWidgetService.ShowWidgets();
+        DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+    }
+
+    [RelayCommand]
+    private void HideDesktopWidgets()
+    {
+        var result = desktopWidgetService.HideWidgets();
+        DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+    }
+
+    [RelayCommand]
+    private void ResetDesktopWidgetLayout()
+    {
+        var result = desktopWidgetService.ResetWidgetLayout();
+        DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+        ApplyDesktopWidgetSettings(appStateService.Settings.Customization.DesktopWidgets);
     }
 
     [RelayCommand]
@@ -412,6 +517,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
     {
         var customizationSettings = appStateService.Settings.Customization;
         var taskbarSettings = customizationSettings.Taskbar;
+        var widgetSettings = customizationSettings.DesktopWidgets;
         isApplyingSettings = true;
 
         SelectedCustomizationPresetKey = customizationSettings.SelectedPresetKey;
@@ -434,6 +540,7 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
         AllowMediumRiskTaskbarChanges = taskbarSettings.AllowMediumRiskTaskbarChanges;
         ShowTaskbarWarnings = taskbarSettings.ShowTaskbarWarnings;
         SelectedTaskbarPresetKey = taskbarSettings.SelectedTaskbarPresetKey;
+        ApplyDesktopWidgetSettings(widgetSettings);
 
         isApplyingSettings = false;
         RefreshSelectedThemeState();
@@ -583,6 +690,99 @@ public partial class CustomizationViewModel : ViewModelBase, IDisposable
 
         update(appStateService.Settings.Customization.Taskbar);
         appStateService.Save();
+    }
+
+    private void ApplyDesktopWidgetSettings(DesktopWidgetSettings settings)
+    {
+        EnableDesktopWidgets = settings.EnableWidgets;
+        StartWidgetsWithApp = settings.StartWidgetsWithApp;
+        LockWidgetPositions = settings.LockWidgetPositions;
+        ShowWidgetBackground = settings.ShowWidgetBackground;
+        DesktopWidgetGlobalOpacity = settings.GlobalOpacity;
+        SelectedWidgetThemeKey = settings.SelectedWidgetThemeKey;
+        DesktopWidgetPreviewBackgroundHex = settings.ShowWidgetBackground ? "#18202A" : "#101418";
+
+        foreach (var definition in DesktopWidgetDefinitions)
+        {
+            definition.IsEnabled = settings.Widgets.Any(widget =>
+                widget.IsEnabled &&
+                string.Equals(widget.WidgetType, definition.Key, StringComparison.Ordinal));
+        }
+    }
+
+    private void PersistDesktopWidgetSettings(Action<DesktopWidgetSettings> update)
+    {
+        if (isApplyingSettings)
+        {
+            return;
+        }
+
+        var settings = appStateService.Settings.Customization.DesktopWidgets;
+        update(settings);
+        var result = desktopWidgetService.SaveSettings(settings);
+        DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+    }
+
+    private bool SetDesktopWidgetEnabled(DesktopWidgetDefinitionViewModel definition, bool isEnabled)
+    {
+        if (isApplyingSettings)
+        {
+            return true;
+        }
+
+        if (!definition.IsImplemented)
+        {
+            DesktopWidgetStatusMessage = $"{definition.Name} is planned for a future widget stage.";
+            return false;
+        }
+
+        var settings = appStateService.Settings.Customization.DesktopWidgets;
+        var instance = settings.Widgets.FirstOrDefault(widget =>
+            string.Equals(widget.WidgetType, definition.Key, StringComparison.Ordinal));
+
+        if (instance is null)
+        {
+            instance = DesktopWidgetCatalog.CreateDefaultInstance(definition.Key);
+            settings.Widgets.Add(instance);
+        }
+
+        instance.IsEnabled = isEnabled;
+        var result = desktopWidgetService.SaveSettings(settings);
+        DesktopWidgetStatusMessage = isEnabled
+            ? $"{definition.Name} enabled. Use Show Widgets to open overlay windows."
+            : $"{definition.Name} disabled.";
+
+        if (!result.Success)
+        {
+            DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+        }
+
+        return true;
+    }
+
+    private void ShowDesktopWidget(DesktopWidgetDefinitionViewModel definition)
+    {
+        if (!definition.IsImplemented)
+        {
+            DesktopWidgetStatusMessage = $"{definition.Name} is planned for a future widget stage.";
+            return;
+        }
+
+        EnableDesktopWidgets = true;
+        if (!definition.IsEnabled)
+        {
+            definition.IsEnabled = true;
+        }
+
+        var result = desktopWidgetService.ShowWidgets();
+        DesktopWidgetStatusMessage = BuildWidgetStatusMessage(result);
+    }
+
+    private static string BuildWidgetStatusMessage(WidgetOperationResult result)
+    {
+        return result.Success
+            ? result.Message
+            : $"{result.Message}{(string.IsNullOrWhiteSpace(result.Details) ? string.Empty : $" {result.Details}")}";
     }
 
     private void PreviewThemePackage(ThemePackageViewModel themePackage)

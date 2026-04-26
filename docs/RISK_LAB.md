@@ -10,6 +10,7 @@ Low risk:
 - App-only themes
 - App-only preview states
 - Overlay windows that can be closed normally
+- App-owned desktop widget overlay windows
 
 Medium risk:
 
@@ -41,6 +42,7 @@ High risk:
 - Require user confirmation before applying risky behavior.
 - Prefer preview-only UI until the implementation is understood.
 - Keep Taskbar Lab V1 app-only except for read-only current-user state detection.
+- Keep Desktop Widgets Overlay V1 app-owned and hideable from NordControl.
 
 ## Future Experimental Ideas
 
@@ -49,6 +51,8 @@ High risk:
 - Real taskbar blur/acrylic implementation
 - Taskbar replacement or Explorer-integrated taskbar modules
 - Desktop widgets
+- Widget dragging and saved overlay positions
+- Rich system metrics widgets
 - Launcher
 - Tiling manager
 - Custom Alt+Tab
@@ -69,3 +73,9 @@ High risk:
 Taskbar Lab V1 is implemented as a safe foundation in Customization -> Taskbar. It includes persisted settings, read-only taskbar state detection, preview-only presets, and an app-only visual mockup.
 
 V1 does not patch Explorer, inject into Explorer, install shell hooks, replace the real taskbar, restart Explorer, or implement real taskbar blur/acrylic. Those ideas remain future Risk Lab work and require explicit confirmation, logging, and rollback planning before any implementation.
+
+## Desktop Widgets Overlay V1 Boundary
+
+Desktop Widgets Overlay V1 is implemented as app-owned Avalonia windows controlled by NordControl. V1 includes Clock and System Monitor Lite widgets, manual show/hide/reset controls, persisted settings, and preview UI inside Customization -> Desktop Widgets.
+
+V1 does not patch Explorer, inject into the shell, replace the desktop, install services, add global hooks, create shell extensions, or modify registry keys. Dragging with saved positions and richer live system metrics are future improvements.
